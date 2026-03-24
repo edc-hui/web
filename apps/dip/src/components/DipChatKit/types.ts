@@ -62,9 +62,12 @@ export interface DipChatKitState {
   chatPanelSize: string | number
 }
 
+export type DipChatKitLocale = 'zh_cn' | 'en_us' | 'zh_tw'
+
 export interface DipChatKitProps {
   className?: string
   style?: React.CSSProperties
+  locale?: DipChatKitLocale
   showHeader?: boolean
   initialSubmitPayload?: AiPromptSubmitPayload
   sessionId?: string

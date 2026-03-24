@@ -22,8 +22,8 @@ const ConversationTurn: React.FC<ConversationTurnProps> = ({
         <UserQuestionBubble
           question={turn.question}
           attachments={turn.questionAttachments}
-          onEdit={() => {
-            onEditQuestion(turn.id, turn.question)
+          onEdit={(editedQuestion) => {
+            onEditQuestion(turn.id, editedQuestion)
           }}
           onCopy={() => {
             onCopyQuestion(turn.question)

@@ -3,7 +3,7 @@
 export interface UserQuestionBubbleProps {
   question: string
   attachments: DipChatKitAttachment[]
-  onEdit: () => void
+  onEdit: (question: string) => void
   onCopy: () => void
 }
 

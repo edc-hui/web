@@ -14,6 +14,7 @@ import DipChatKit from '@/components/DipChatKit'
 | --- | --- | --- | --- |
 | `className` | `string` | `-` | 组件根节点自定义类名。 |
 | `style` | `React.CSSProperties` | `-` | 组件根节点行内样式。 |
+| `locale` | `'zh_cn' \| 'en_us' \| 'zh_tw'` | `'zh_cn'` | 组件内置国际化标识。内部会自动映射并引入对应的 `antd` + `@ant-design/x` 语言包。 |
 | `showHeader` | `boolean` | `true` | 是否显示顶部 `DipChatHeader`。 |
 | `initialSubmitPayload` | `AiPromptSubmitPayload` | `-` | 直接接收 `AiPromptInput onSubmit` 原始参数，组件内部会自动组装首条 `pendingSend` 消息。 |
 | `sessionId` | `string` | `undefined` | 会话详情拉取开关：<br/>1. `undefined`：不接管当前会话，沿用本地对话流；<br/>2. `''` 或空白字符串：清空聊天区；<br/>3. 非空字符串：请求会话详情并渲染到聊天区域。 |
@@ -75,4 +76,10 @@ interface AiPromptSubmitPayload {
 
 ```tsx
 <DipChatKit assignEmployeeValue="employee-id-001" />
+```
+
+### 6. 传入字符串 locale
+
+```tsx
+<DipChatKit locale="en_us" />
 ```

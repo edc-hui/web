@@ -252,6 +252,11 @@ const AiAnswerBubble: React.FC<AiAnswerBubbleProps> = ({ turn, onCopy, onRegener
               streaming={turn.answerStreaming}
               typing={turn.answerStreaming ? { effect: 'fade-in' } : false}
               loading={turn.answerLoading && isEmpty(turn.answerMarkdown)}
+              styles={{
+                footer: {
+                  marginBlockStart: 6,
+                },
+              }}
               contentRender={(content) => {
                 return (
                   <XMarkdown className={styles.markdownRoot} components={markdownComponents}>

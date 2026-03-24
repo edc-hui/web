@@ -4,7 +4,7 @@ import { Col, Row, Tooltip } from 'antd'
 import clsx from 'clsx'
 import isEmpty from 'lodash/isEmpty'
 import type React from 'react'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import intl from 'react-intl-universal'
 import ResizeObserver from '@/components/ResizeObserver'
 import MessageActions from '../MessageActions'
@@ -18,6 +18,11 @@ const UserQuestionBubble: React.FC<UserQuestionBubbleProps> = ({
   onCopy,
 }) => {
   const [fileColSpan, setFileColSpan] = useState(12)
+  const [editing, setEditing] = useState(false)
+
+  useEffect(() => {
+    setEditing(false)
+  }, [question])
 
   return (
     <div className={clsx('UserQuestionBubble', styles.root)}>
@@ -59,9 +64,25 @@ const UserQuestionBubble: React.FC<UserQuestionBubbleProps> = ({
 
       <Bubble
         className={styles.bubble}
-        content={<span className={styles.questionText}>{question}</span>}
+        content={question}
+        contentRender={(content) => {
+          return <span className={styles.questionText}>{content}</span>
+        }}
         shape="corner"
         placement="end"
+        editable={{ editing }}
+        styles={{
+          footer: {
+            marginBlockStart: 6,
+          },
+        }}
+        onEditConfirm={(editedQuestion) => {
+          setEditing(false)
+          onEdit(editedQuestion)
+        }}
+        onEditCancel={() => {
+          setEditing(false)
+        }}
         footer={
           <div className={styles.actionsWrap}>
             <MessageActions
@@ -70,7 +91,9 @@ const UserQuestionBubble: React.FC<UserQuestionBubbleProps> = ({
                   key: 'edit-question',
                   title: intl.get('dipChatKit.editQuestion').d('编辑问题') as string,
                   icon: <EditOutlined />,
-                  onClick: onEdit,
+                  onClick: () => {
+                    setEditing(true)
+                  },
                 },
                 {
                   key: 'copy-question',

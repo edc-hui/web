@@ -343,11 +343,8 @@ const ChatContentArea: React.FC<ChatContentAreaProps> = ({
                 <ConversationTurn
                   key={turn.id}
                   turn={turn}
-                  onEditQuestion={(_, question) => {
-                    setInputValue(question)
-                    message.success(
-                      intl.get('dipChatKit.questionFilledBack').d('问题内容已回填至输入框'),
-                    )
+                  onEditQuestion={() => {
+                    // Intentionally left blank: edit confirm handling will be added in future iterations.
                   }}
                   onCopyQuestion={(question) => {
                     void copyText(
@@ -387,29 +384,29 @@ const ChatContentArea: React.FC<ChatContentAreaProps> = ({
         </div>
       </ScrollContainer>
 
-      {scroll.showBackToBottom && (
-        <div className={styles.backToBottomWrap}>
-          <div className={styles.backToBottomBtn}>
-            <Tooltip title={intl.get('dipChatKit.backToBottom').d('返回底部')}>
-              <Button
-                type="primary"
-                shape="circle"
-                aria-label={intl.get('dipChatKit.backToBottom').d('返回底部') as string}
-                icon={<VerticalAlignBottomOutlined />}
-                onClick={() => {
-                  scrollRef.current?.scrollToBottom('smooth')
-                  setShowBackToBottom(false)
-                  if (streamLoading) {
-                    setAutoScrollEnabled(true)
-                  }
-                }}
-              />
-            </Tooltip>
-          </div>
-        </div>
-      )}
-
       <div className={styles.inputArea}>
+        {scroll.showBackToBottom && (
+          <div className={styles.backToBottomWrap}>
+            <div className={styles.backToBottomBtn}>
+              <Tooltip title={intl.get('dipChatKit.backToBottom').d('返回底部')}>
+                <Button
+                  // type="primary"
+                  shape="circle"
+                  aria-label={intl.get('dipChatKit.backToBottom').d('返回底部') as string}
+                  icon={<VerticalAlignBottomOutlined />}
+                  onClick={() => {
+                    scrollRef.current?.scrollToBottom('smooth')
+                    setShowBackToBottom(false)
+                    if (streamLoading) {
+                      setAutoScrollEnabled(true)
+                    }
+                  }}
+                />
+              </Tooltip>
+            </div>
+          </div>
+        )}
+
         <div className={styles.inputContent}>
           <div className={styles.inputInner}>
             <AiPromptInput
