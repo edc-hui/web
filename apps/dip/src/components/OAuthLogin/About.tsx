@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { useOEMConfigStore } from '@/stores/oemConfigStore'
 
 function About() {
-  const [version, setVersion] = useState<string>('')
+  const [version] = useState<string>('')
   const { getOEMBasicConfig } = useOEMConfigStore()
   const oemBasicConfig = getOEMBasicConfig()
 

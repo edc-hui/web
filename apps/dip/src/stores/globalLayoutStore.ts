@@ -23,4 +23,3 @@ export const useGlobalLayoutStore = create<GlobalLayoutState>((set) => ({
 export const setGlobalSiderCollapsed = (collapsed: boolean) => {
   useGlobalLayoutStore.getState().setCollapsed(collapsed)
 }
-

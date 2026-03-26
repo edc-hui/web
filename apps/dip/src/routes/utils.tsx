@@ -149,8 +149,7 @@ export const isRouteVisibleForRoles = (route: RouteConfig, roleIds: Set<string>)
 
 export const getFirstVisibleSidebarRoute = (roleIds: Set<string>): RouteConfig | undefined => {
   return routeConfigs.find(
-    (r) =>
-      getRouteSidebarMode(r) === 'menu' && r.key && isRouteVisibleForRoles(r, roleIds),
+    (r) => getRouteSidebarMode(r) === 'menu' && r.key && isRouteVisibleForRoles(r, roleIds),
   )
 }
 

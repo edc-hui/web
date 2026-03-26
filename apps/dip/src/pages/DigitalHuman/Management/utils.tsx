@@ -1,12 +1,10 @@
 import type { MenuProps } from 'antd'
 import intl from 'react-intl-universal'
-import type { DigitalHuman } from '@/apis'
 import IconFont from '@/components/IconFont'
 import { DigitalHumanManagementActionEnum } from './types'
 
 /** 应用商店操作菜单项 */
 export const getDigitalHumanManagementMenuItems = (
-  digitalHuman: DigitalHuman,
   onMenuClick: (key: DigitalHumanManagementActionEnum) => void,
 ): MenuProps['items'] => {
   return [

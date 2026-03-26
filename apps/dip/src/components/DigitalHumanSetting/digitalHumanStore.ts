@@ -1,10 +1,5 @@
 import { create } from 'zustand'
-import type {
-  BknEntry,
-  ChannelConfig,
-  DigitalHumanDetail,
-  DigitalHumanSkill,
-} from '@/apis'
+import type { BknEntry, ChannelConfig, DigitalHumanDetail, DigitalHumanSkill } from '@/apis'
 
 export type DigitalHumanUiMode = 'create' | 'edit' | 'view'
 

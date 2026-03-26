@@ -15,7 +15,7 @@ interface ProjectCardProps {
   onCardClick?: (project: Project) => void
 }
 
-const ProjectCard: React.FC<ProjectCardProps> = ({ project, width, menuItems, onCardClick }) => {
+const ProjectCard: React.FC<ProjectCardProps> = ({ project, menuItems, onCardClick }) => {
   const [menuOpen, setMenuOpen] = useState(false)
 
   const updateTime = project.edited_at ? formatTimeSlash(new Date(project.edited_at).getTime()) : ''

@@ -71,9 +71,7 @@ const DHSetting = () => {
   }
 
   const headerDisplayName =
-    uiMode === 'edit'
-      ? (frozenDisplayNameForEdit ?? basic.name).trim() || basic.name
-      : basic.name
+    uiMode === 'edit' ? (frozenDisplayNameForEdit ?? basic.name).trim() || basic.name : basic.name
 
   const handlePublish = async () => {
     const name = basic.name.trim()

@@ -20,7 +20,6 @@ export interface TiptapEditorProps {
 
 export const TiptapEditor: React.FC<TiptapEditorProps> = ({
   initialContent = {},
-  onChange,
   onUpdate,
   onLoadingStateChange,
   readOnly = false,
@@ -94,7 +93,7 @@ export const TiptapEditor: React.FC<TiptapEditorProps> = ({
           const doc = (editor.storage as any).markdown.parse(initialContentRef.current)
           if (doc) {
             isProgrammaticUpdateRef.current = true
-            editor.commands.setContent(doc.toJSON(), false)
+            editor.commands.setContent(doc.toJSON(), { emitUpdate: false })
             isProgrammaticUpdateRef.current = false
           }
         } else if (
@@ -103,7 +102,7 @@ export const TiptapEditor: React.FC<TiptapEditorProps> = ({
         ) {
           // 如果是 JSON 对象，直接设置内容
           isProgrammaticUpdateRef.current = true
-          editor.commands.setContent(initialContentRef.current, false)
+          editor.commands.setContent(initialContentRef.current, { emitUpdate: false })
           isProgrammaticUpdateRef.current = false
         }
       }
@@ -168,7 +167,7 @@ export const TiptapEditor: React.FC<TiptapEditorProps> = ({
 
   useEffect(() => {
     if (editor) {
-      editor.setEditable(!readOnly && !isInitializingRef.current)
+      editor.setEditable(!(readOnly || isInitializingRef.current))
     }
   }, [readOnly, editor])
 
@@ -184,7 +183,7 @@ export const TiptapEditor: React.FC<TiptapEditorProps> = ({
     if (editor) {
       lockEditor(editor)
       isProgrammaticUpdateRef.current = true
-      editor.commands.setContent(initialContentRef.current, false)
+      editor.commands.setContent(initialContentRef.current, { emitUpdate: false })
       isProgrammaticUpdateRef.current = false
       unlockEditorWithDelay(editor)
     }

@@ -13,7 +13,11 @@ export function observeCLS(): void {
       const e = entry as PerformanceEntry & {
         hadRecentInput?: boolean
         value?: number
-        sources?: ReadonlyArray<{ node?: Node; previousRect: DOMRectReadOnly; currentRect: DOMRectReadOnly }>
+        sources?: ReadonlyArray<{
+          node?: Node
+          previousRect: DOMRectReadOnly
+          currentRect: DOMRectReadOnly
+        }>
       }
       if (!e.hadRecentInput && e.value !== undefined) {
         clsValue += e.value
@@ -32,10 +36,25 @@ export function observeCLS(): void {
                   tag: el.tagName,
                   id: el.id || undefined,
                   className: el.className || undefined,
-                  previousRect: { x: src.previousRect.x, y: src.previousRect.y, width: src.previousRect.width, height: src.previousRect.height },
-                  currentRect: { x: src.currentRect.x, y: src.currentRect.y, width: src.currentRect.width, height: src.currentRect.height },
+                  previousRect: {
+                    x: src.previousRect.x,
+                    y: src.previousRect.y,
+                    width: src.previousRect.width,
+                    height: src.previousRect.height,
+                  },
+                  currentRect: {
+                    x: src.currentRect.x,
+                    y: src.currentRect.y,
+                    width: src.currentRect.width,
+                    height: src.currentRect.height,
+                  },
                 }
-              : { index: i + 1, node: null, previousRect: src.previousRect, currentRect: src.currentRect }
+              : {
+                  index: i + 1,
+                  node: null,
+                  previousRect: src.previousRect,
+                  currentRect: src.currentRect,
+                }
             console.log(`[CLS] source #${info.index}`, info)
           })
         }
@@ -53,7 +72,9 @@ export function observeCLS(): void {
   // 页面卸载或隐藏时输出最终 CLS
   const reportFinal = () => {
     if (sessionCount > 0) {
-      console.log(`[CLS] 本次会话结束 — 偏移次数: ${sessionCount}, 最终 CLS: ${clsValue.toFixed(4)}`)
+      console.log(
+        `[CLS] 本次会话结束 — 偏移次数: ${sessionCount}, 最终 CLS: ${clsValue.toFixed(4)}`,
+      )
     }
   }
   window.addEventListener('pagehide', reportFinal)

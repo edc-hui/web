@@ -135,9 +135,7 @@ const Management = () => {
         menuItems={
           isAdmin
             ? (digitalHuman) =>
-                getDigitalHumanManagementMenuItems(digitalHuman, (key) =>
-                  handleMenuClick(key, digitalHuman),
-                )
+                getDigitalHumanManagementMenuItems((key) => handleMenuClick(key, digitalHuman))
             : undefined
         }
       />

@@ -1,29 +1,22 @@
 import type { Mark, MarkType, Node, NodeType } from '@tiptap/pm/model'
-import type { Data } from 'mdast'
 import type { Processor } from 'unified'
-import type { Node as UnistNode } from 'unist'
-import type { ParserState } from '../parser/state'
-import type { SerializerState } from '../serializer/state'
+import type { MarkdownNode } from './base'
+import type { IParserState } from './parser-state'
+import type { ISerializerState } from './serializer-state'
 
-export interface Attrs {
-  [key: string]: any
-}
-
-export interface MarkdownNode extends UnistNode {
-  data?: Data & Record<string, any>
-  children?: Array<MarkdownNode>
-  [key: string]: any
-}
+export type { Attrs, MarkdownNode } from './base'
+export type { IParserState } from './parser-state'
+export type { ISerializerState } from './serializer-state'
 
 export interface MarkMarkdownStorage {
   markdown?: {
     parser?: {
       match: (node: MarkdownNode) => boolean
-      apply: (state: ParserState, node: MarkdownNode, type: MarkType) => void
+      apply: (state: IParserState, node: MarkdownNode, type: MarkType) => void
     }
     serializer?: {
       match: (mark: Mark) => boolean
-      apply: (state: SerializerState, mark: Mark, node: Node) => boolean
+      apply: (state: ISerializerState, mark: Mark, node: Node) => boolean
     }
     hooks?: {
       beforeInit?: (processor: Processor) => Processor
@@ -40,11 +33,11 @@ export interface NodeMarkdownStorage {
   markdown?: {
     parser?: {
       match: (node: MarkdownNode) => boolean
-      apply: (state: ParserState, node: MarkdownNode, type: NodeType) => void
+      apply: (state: IParserState, node: MarkdownNode, type: NodeType) => void
     }
     serializer?: {
       match: (node: Node) => boolean
-      apply: (state: SerializerState, node: Node) => void
+      apply: (state: ISerializerState, node: Node) => void
     }
     hooks?: {
       beforeInit?: (processor: Processor) => Processor
@@ -53,15 +46,6 @@ export interface NodeMarkdownStorage {
       afterParse?: (root: MarkdownNode) => MarkdownNode
       beforeSerialize?: (root: MarkdownNode) => MarkdownNode
       afterSerialize?: (markdown: string) => string
-    }
-  }
-}
-
-declare module 'unist' {
-  interface Data {
-    hName?: string
-    hProperties?: {
-      className?: string[]
     }
   }
 }

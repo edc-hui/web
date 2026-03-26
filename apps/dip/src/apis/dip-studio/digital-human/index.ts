@@ -52,8 +52,7 @@ export const getDigitalHumanDetail = (id: string): Promise<DigitalHumanDetail> =
 export const updateDigitalHuman = (
   id: string,
   body: UpdateDigitalHumanRequest,
-): Promise<UpdateDigitalHumanResponse> =>
-  put(`${BASE}/digital-human/${id}`, { body })
+): Promise<UpdateDigitalHumanResponse> => put(`${BASE}/digital-human/${id}`, { body })
 
 /** 删除数字员工（deleteDigitalHuman） */
 export const deleteDigitalHuman = (

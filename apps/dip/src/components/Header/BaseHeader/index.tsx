@@ -127,9 +127,7 @@ const BaseHeader = ({ headerType }: { headerType: HeaderType }) => {
 
       if (shouldShowCurrentRouteInBreadcrumb(currentRoute) && currentRoute.label) {
         const dynamicTitle =
-          detailBreadcrumb &&
-          currentRoute.key &&
-          detailBreadcrumb.routeKey === currentRoute.key
+          detailBreadcrumb && currentRoute.key && detailBreadcrumb.routeKey === currentRoute.key
             ? detailBreadcrumb.title
             : undefined
         const displayName = dynamicTitle ?? currentRoute.label

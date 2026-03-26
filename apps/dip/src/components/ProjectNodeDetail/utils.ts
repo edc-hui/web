@@ -13,9 +13,11 @@ function sanitizeInitialContentNode(node: any): any {
 
   const sanitizedNode: Record<string, any> = { ...node }
 
-  if (Object.prototype.hasOwnProperty.call(sanitizedNode, 'content')) {
+  if (Object.hasOwn(sanitizedNode, 'content')) {
     if (Array.isArray(sanitizedNode.content)) {
-      sanitizedNode.content = sanitizedNode.content.map((item: any) => sanitizeInitialContentNode(item))
+      sanitizedNode.content = sanitizedNode.content.map((item: any) =>
+        sanitizeInitialContentNode(item),
+      )
     } else if (sanitizedNode.content && typeof sanitizedNode.content === 'object') {
       sanitizedNode.content = sanitizeInitialContentNode(sanitizedNode.content)
     }

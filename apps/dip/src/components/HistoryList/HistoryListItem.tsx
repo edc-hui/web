@@ -4,15 +4,7 @@ import IconFont from '@/components/IconFont'
 import type { PlanListItemProps } from './types'
 import { formatPlanRelativeDayTime, getSessionTitle } from './utils'
 
-function HistoryMetaColumn({
-  icon,
-  label,
-  value,
-}: {
-  icon: ReactNode
-  label: string
-  value: string
-}) {
+function HistoryMetaColumn({ value }: { icon: ReactNode; label: string; value: string }) {
   return (
     <div className="flex min-w-0 max-w-[140px] flex-col gap-1">
       {/* <div className="flex items-center justify-center gap-1 text-xs leading-[18px] text-[--dip-text-color-45]">

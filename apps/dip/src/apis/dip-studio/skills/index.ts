@@ -1,8 +1,5 @@
 import { get } from '@/utils/http'
-import type {
-  DigitalHumanAgentSkillList,
-  DigitalHumanSkillList,
-} from './index.d'
+import type { DigitalHumanAgentSkillList, DigitalHumanSkillList } from './index.d'
 
 export type {
   DigitalHumanAgentSkill,

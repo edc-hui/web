@@ -1,7 +1,7 @@
 import type { Editor } from '@tiptap/core'
 import { Mark } from '@tiptap/pm/model'
 import type { Root } from 'mdast'
-import type { MarkdownNode } from '../types'
+import type { MarkdownNode } from '../types/base'
 
 export class SerializerStack {
   // @ts-expect-error

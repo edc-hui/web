@@ -66,7 +66,7 @@ const ChannelConfig = ({ readonly }: ChannelConfigProps) => {
         dataIndex: 'description',
         key: 'description',
         ellipsis: true,
-        render: (text: string, record: DhChannelConfig) =>
+        render: (_: string, record: DhChannelConfig) =>
           `用于在${record.type === 'dingtalk' ? '钉钉' : '飞书'}客户端接收消息，处理事务`,
       },
       {

@@ -1,11 +1,9 @@
 import type { MenuProps } from 'antd'
-import type { ApplicationInfo } from '@/apis'
 import IconFont from '@/components/IconFont'
 import { AppStoreActionEnum } from './types'
 
 /** 应用商店操作菜单项 */
 export const getAppStoreMenuItems = (
-  app: ApplicationInfo,
   onMenuClick: (key: AppStoreActionEnum) => void,
 ): MenuProps['items'] => {
   // const isWenshuApp = app.key === WENSHU_APP_KEY

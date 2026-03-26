@@ -8,8 +8,8 @@ import {
   type ArchivePreviewViewer,
   formatPreviewContent,
   getArchiveFileMimeForBlob,
-  getArchiveTextPreviewViewer,
   getArchivePreviewViewer,
+  getArchiveTextPreviewViewer,
   previewResponseType,
 } from '../utils'
 
@@ -40,7 +40,13 @@ export function useArchivePreview(dhId: string, sessionId: string) {
     async (subpath: string, title: string) => {
       if (!(dhId && sessionId)) return
       revokePreviewBlobUrl()
-      setPreview({ title, subpath, body: '', loading: true, viewer: getArchiveTextPreviewViewer(title) })
+      setPreview({
+        title,
+        subpath,
+        body: '',
+        loading: true,
+        viewer: getArchiveTextPreviewViewer(title),
+      })
       try {
         const rt = previewResponseType(title)
         if (rt === 'arraybuffer') {

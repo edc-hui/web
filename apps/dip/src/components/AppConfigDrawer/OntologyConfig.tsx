@@ -1,5 +1,5 @@
-import { CheckCircleOutlined, InfoCircleOutlined, ShareAltOutlined } from '@ant-design/icons'
-import { Alert, message, Spin, Tag } from 'antd'
+import { ShareAltOutlined } from '@ant-design/icons'
+import { Alert, message, Spin } from 'antd'
 import { memo, useEffect, useState } from 'react'
 import { getApplicationsOntologies, type OntologyInfo } from '@/apis'
 import ScrollBarContainer from '../ScrollBarContainer'

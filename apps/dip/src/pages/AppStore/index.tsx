@@ -178,7 +178,7 @@ const AppStore = () => {
       <AppList
         mode={ModeEnum.AppStore}
         apps={apps}
-        menuItems={(app) => getAppStoreMenuItems(app, (key) => handleMenuClick(key, app))}
+        menuItems={(app) => getAppStoreMenuItems((key) => handleMenuClick(key, app))}
       />
     )
   }

@@ -1,10 +1,15 @@
 import type { Editor } from '@tiptap/core'
 import type { Fragment, Mark, Node } from '@tiptap/pm/model'
 import type { Processor } from 'unified'
-import type { MarkdownNode, MarkMarkdownStorage, NodeMarkdownStorage } from '../types'
+import type {
+  ISerializerState,
+  MarkdownNode,
+  MarkMarkdownStorage,
+  NodeMarkdownStorage,
+} from '../types'
 import { SerializerStack } from './stack'
 
-export class SerializerState {
+export class SerializerState implements ISerializerState {
   public readonly editor: Editor
   public readonly processor: Processor
   private readonly stack: SerializerStack

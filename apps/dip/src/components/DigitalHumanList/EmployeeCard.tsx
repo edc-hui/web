@@ -20,12 +20,7 @@ interface EmployeeCardProps {
   onCardClick?: (digitalHuman: DigitalHuman) => void
 }
 
-const EmployeeCard: React.FC<EmployeeCardProps> = ({
-  digitalHuman,
-  width,
-  menuItems,
-  onCardClick,
-}) => {
+const EmployeeCard: React.FC<EmployeeCardProps> = ({ digitalHuman, menuItems, onCardClick }) => {
   const [menuOpen, setMenuOpen] = useState(false)
   // const updateTime = digitalHuman.updated_at
   //   ? formatTimeSlash(new Date(digitalHuman.updated_at).getTime())

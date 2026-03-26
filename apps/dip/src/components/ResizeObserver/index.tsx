@@ -1,14 +1,14 @@
-import React, { type PropsWithChildren, useEffect, useRef } from 'react';
+import React, { type PropsWithChildren, useEffect, useRef } from 'react'
 
 export type ResizeProps = {
-  width: number;
-  height: number;
-  dom: HTMLElement;
-  visible: boolean; // 监听的元素在视口内是否处于可见状态
-};
+  width: number
+  height: number
+  dom: HTMLElement
+  visible: boolean // 监听的元素在视口内是否处于可见状态
+}
 
 interface ResizeObserverProps {
-  onResize?: (data: ResizeProps) => void;
+  onResize?: (data: ResizeProps) => void
 }
 
 /**
@@ -19,33 +19,36 @@ interface ResizeObserverProps {
  * @param onResize
  * @constructor
  */
-const DipResizeObserver: React.FC<PropsWithChildren<ResizeObserverProps>> = ({ children, onResize }) => {
-  const resizeObserverRef = useRef<ResizeObserver>();
-  const domRef = useRef<HTMLElement | null>(null);
+const DipResizeObserver: React.FC<PropsWithChildren<ResizeObserverProps>> = ({
+  children,
+  onResize,
+}) => {
+  const resizeObserverRef = useRef<ResizeObserver>()
+  const domRef = useRef<HTMLElement | null>(null)
   useEffect(() => {
-    createResizeObserver();
+    createResizeObserver()
     return () => {
-      destroyResizeObserver();
-    };
-  }, []);
+      destroyResizeObserver()
+    }
+  }, [])
 
   const createResizeObserver = () => {
     resizeObserverRef.current = new ResizeObserver(() => {
       if (domRef.current) {
-        const { width, height } = domRef.current.getBoundingClientRect();
-        onResize && onResize({ width, height, dom: domRef.current, visible: width !== 0 });
+        const { width, height } = domRef.current.getBoundingClientRect()
+        onResize && onResize({ width, height, dom: domRef.current, visible: width !== 0 })
       }
-    });
-    resizeObserverRef.current?.observe(domRef.current as Element);
-  };
+    })
+    resizeObserverRef.current?.observe(domRef.current as Element)
+  }
 
   const destroyResizeObserver = () => {
-    resizeObserverRef.current?.disconnect();
-  };
+    resizeObserverRef.current?.disconnect()
+  }
 
   return React.cloneElement(children as React.ReactElement, {
     ref: domRef,
-  });
-};
+  })
+}
 
-export default DipResizeObserver;
+export default DipResizeObserver
