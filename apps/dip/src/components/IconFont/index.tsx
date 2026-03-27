@@ -6,6 +6,8 @@ import type { CSSProperties } from 'react'
 import '@/assets/fonts/iconfont.js'
 import '@/assets/fonts/color-iconfont.js'
 import '@/assets/fonts/dip-studio-iconfont.js'
+import '@/assets/fonts/kw-icon.js'
+import '@/assets/fonts/kw-color-icon.js'
 
 const IconBaseComponent = createFromIconfontCN({
   scriptUrl: [],

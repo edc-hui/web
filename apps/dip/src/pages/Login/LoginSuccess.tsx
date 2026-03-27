@@ -1,8 +1,8 @@
 import { Spin } from 'antd'
 import { useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { getGuideStatus } from '@/apis/dip-studio/guide'
 import GradientContainer from '@/components/GradientContainer'
-import { resolveDefaultMicroAppPath } from '@/routes/utils'
 import { useUserInfoStore } from '@/stores'
 
 const LoginSuccess = () => {
@@ -27,7 +27,7 @@ const LoginSuccess = () => {
               return
             }
 
-            const { userInfo: currentUserInfo } = useUserInfoStore.getState()
+            const { userInfo: currentUserInfo, isAdmin } = useUserInfoStore.getState()
             if (currentUserInfo) {
               // 用户信息加载成功，根据权限跳转
               // 注意：如果有 asredirect 参数，后端会直接重定向到该地址，不会到 login-success 页面
@@ -39,14 +39,39 @@ const LoginSuccess = () => {
               // hasNavigatedRef.current = true
               // navigate(to, { replace: true })
 
+              // TODO: 暂时不使用默认微应用路由
               // 通过公共方法解析默认微应用路由（基于固定应用 key）
-              resolveDefaultMicroAppPath().then((targetPath) => {
-                if (hasNavigatedRef.current) {
-                  return
+              // resolveDefaultMicroAppPath().then((targetPath) => {
+              //   if (hasNavigatedRef.current) {
+              //     return
+              //   }
+              //   hasNavigatedRef.current = true
+              //   navigate(targetPath, { replace: true })
+              // })
+              if (!isAdmin) {
+                navigate('/home', { replace: true })
+                return
+              }
+
+              void (async () => {
+                try {
+                  const guideStatus = await getGuideStatus()
+                  if (hasNavigatedRef.current) return
+                  if (guideStatus.ready) {
+                    navigate('/digital-human/management', { replace: true })
+                    return
+                  }
+
+                  navigate('/initial-configuration', {
+                    replace: true,
+                    state: { guideStatus, breadcrumbMode: 'init-only' },
+                  })
+                } catch {
+                  // 初始化状态接口失败时，避免阻塞管理员进入系统
+                  if (hasNavigatedRef.current) return
+                  navigate('/digital-human/management', { replace: true })
                 }
-                hasNavigatedRef.current = true
-                navigate(targetPath, { replace: true })
-              })
+              })()
             } else {
               // 请求完成但没有用户信息，说明获取失败
               hasNavigatedRef.current = true
@@ -68,7 +93,7 @@ const LoginSuccess = () => {
 
   return (
     <GradientContainer className="w-full h-full flex items-center justify-center">
-      <Spin size="large" />
+      <Spin />
     </GradientContainer>
   )
 }

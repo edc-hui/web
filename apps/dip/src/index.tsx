@@ -2,7 +2,6 @@ import ReactDOM from 'react-dom/client'
 import './index.css'
 import App from './App'
 import './styles/theme.less'
-import { observeCLS } from './utils/observeCLS'
 
 // 初始化应用
 async function initApp() {

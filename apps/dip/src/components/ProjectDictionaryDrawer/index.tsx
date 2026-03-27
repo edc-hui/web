@@ -1,4 +1,3 @@
-import { PlusOutlined } from '@ant-design/icons'
 import { Button, Drawer, Form, Input, Modal, message, Table, Tooltip } from 'antd'
 import { useCallback, useEffect, useState } from 'react'
 import {
@@ -198,7 +197,7 @@ const ProjectDictionaryDrawer = ({ open, onClose, projectId }: ProjectDictionary
             <Button
               variant="link"
               color="default"
-              icon={<IconFont type="icon-dip-bianji" />}
+              icon={<IconFont type="icon-edit" />}
               onClick={() => handleEdit(record)}
             />
           </Tooltip>
@@ -206,7 +205,7 @@ const ProjectDictionaryDrawer = ({ open, onClose, projectId }: ProjectDictionary
             <Button
               variant="link"
               color="default"
-              icon={<IconFont type="icon-dip-trash" />}
+              icon={<IconFont type="icon-trash" />}
               onClick={() => handleDelete(record)}
             />
           </Tooltip>
@@ -221,7 +220,7 @@ const ProjectDictionaryDrawer = ({ open, onClose, projectId }: ProjectDictionary
       open={open}
       onClose={onClose}
       closable={{ placement: 'end' }}
-      maskClosable
+      mask={{ closable: false }}
       destroyOnHidden
       styles={{
         wrapper: { width: '60%', minWidth: 640 },
@@ -235,7 +234,7 @@ const ProjectDictionaryDrawer = ({ open, onClose, projectId }: ProjectDictionary
         {/* 头部 */}
         <div className="flex items-center justify-between gap-x-2">
           <span className="text-sm font-medium text-[--dip-text-color]">项目词典列表</span>
-          <Button type="primary" icon={<PlusOutlined />} onClick={handleAdd}>
+          <Button type="primary" icon={<IconFont type="icon-add" />} onClick={handleAdd}>
             新建术语
           </Button>
         </div>

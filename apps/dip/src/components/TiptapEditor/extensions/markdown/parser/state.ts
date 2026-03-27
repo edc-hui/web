@@ -1,10 +1,16 @@
 import type { Editor } from '@tiptap/core'
 import type { MarkType, Node, NodeType } from '@tiptap/pm/model'
 import type { Processor } from 'unified'
-import type { Attrs, MarkdownNode, MarkMarkdownStorage, NodeMarkdownStorage } from '../types'
+import type {
+  Attrs,
+  IParserState,
+  MarkdownNode,
+  MarkMarkdownStorage,
+  NodeMarkdownStorage,
+} from '../types'
 import { ParserStack } from './stack'
 
-export class ParserState {
+export class ParserState implements IParserState {
   public readonly editor: Editor
   public readonly processor: Processor
   private readonly stack: ParserStack

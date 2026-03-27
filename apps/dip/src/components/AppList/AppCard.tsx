@@ -65,7 +65,7 @@ const AppCard: React.FC<AppCardProps> = ({
             size={64}
             className="w-full h-full"
             hasBorder
-            isBuiltIn={app.isBuiltIn}
+            // isBuiltIn={app.isBuiltIn}
           />
         </div>
         {/* 名称 + 版本号 + 描述 */}
@@ -85,7 +85,7 @@ const AppCard: React.FC<AppCardProps> = ({
                   }}
                 >
                   <span className="text-xs">立即使用</span>
-                  <IconFont type="icon-dip-arrow-up" rotate={90} className="text-xs" />
+                  <IconFont type="icon-arrowup" rotate={90} className="text-xs" />
                 </Button>
               )}
             </div>
@@ -109,7 +109,7 @@ const AppCard: React.FC<AppCardProps> = ({
         <div className="flex items-center justify-between">
           {/* 更新信息 */}
           <div className="flex items-center text-xs text-[var(--dip-text-color-45)]">
-            <Avatar size={24} className="flex-shrink-0 mr-2">
+            <Avatar size="small" className="flex-shrink-0 mr-2">
               {userName.charAt(0)}
             </Avatar>
             <span
@@ -143,7 +143,7 @@ const AppCard: React.FC<AppCardProps> = ({
                     : 'opacity-0 invisible group-hover:opacity-100 group-hover:visible',
                 )}
               >
-                <IconFont type="icon-dip-gengduo" />
+                <IconFont type="icon-more" />
               </button>
             </Dropdown>
           )}

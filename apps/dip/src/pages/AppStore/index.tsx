@@ -1,4 +1,4 @@
-import { ExclamationCircleFilled, ReloadOutlined } from '@ant-design/icons'
+import { ExclamationCircleFilled } from '@ant-design/icons'
 import { Button, Modal, message, Spin, Tooltip } from 'antd'
 import { memo, useCallback, useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
@@ -103,8 +103,8 @@ const AppStore = () => {
 
           /** 运行应用 */
           case AppStoreActionEnum.Run:
-            setAppSource(_app.id, 'store')
-            navigate(`/application/${_app.id}`)
+            setAppSource(_app.key, 'store')
+            navigate(`/application/${encodeURIComponent(_app.key)}`)
             break
 
           /** 授权管理 */
@@ -127,7 +127,7 @@ const AppStore = () => {
   /** 渲染状态内容（loading/error/empty） */
   const renderStateContent = () => {
     if (loading) {
-      return <Spin size="large" />
+      return <Spin />
     }
 
     if (error) {
@@ -152,7 +152,7 @@ const AppStore = () => {
           <Button
             className="mt-1"
             type="primary"
-            icon={<IconFont type="icon-dip-upload" />}
+            icon={<IconFont type="icon-upload" />}
             onClick={() => {
               setInstallModalVisible(true)
             }}
@@ -178,7 +178,7 @@ const AppStore = () => {
       <AppList
         mode={ModeEnum.AppStore}
         apps={apps}
-        menuItems={(app) => getAppStoreMenuItems(app, (key) => handleMenuClick(key, app))}
+        menuItems={(app) => getAppStoreMenuItems((key) => handleMenuClick(key, app))}
       />
     )
   }
@@ -198,11 +198,11 @@ const AppStore = () => {
           <div className="flex items-center gap-x-2">
             <SearchInput onSearch={handleSearch} placeholder="搜索应用" />
             <Tooltip title="刷新">
-              <Button type="text" icon={<ReloadOutlined />} onClick={handleRefresh} />
+              <Button type="text" icon={<IconFont type="icon-refresh" />} onClick={handleRefresh} />
             </Tooltip>
             <Button
               type="primary"
-              icon={<IconFont type="icon-dip-upload" />}
+              icon={<IconFont type="icon-upload" />}
               onClick={() => setInstallModalVisible(true)}
             >
               安装应用

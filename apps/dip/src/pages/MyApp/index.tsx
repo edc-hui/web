@@ -1,4 +1,3 @@
-import { ReloadOutlined } from '@ant-design/icons'
 import { Button, message, Spin, Tooltip } from 'antd'
 import { memo, useCallback, useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
@@ -6,9 +5,9 @@ import type { ApplicationInfo } from '@/apis'
 import AppList from '@/components/AppList'
 import { ModeEnum } from '@/components/AppList/types'
 import Empty from '@/components/Empty'
+import IconFont from '@/components/IconFont'
 import SearchInput from '@/components/SearchInput'
 import { useApplicationsService } from '@/hooks/useApplicationsService'
-import { WENSHU_APP_KEY } from '@/routes/types'
 import { useMicroAppStore, usePreferenceStore } from '@/stores'
 import { MyAppActionEnum } from './types'
 import { getMyAppMoreBtn } from './utils'
@@ -71,8 +70,8 @@ const MyApp = () => {
           break
         }
         case MyAppActionEnum.Use:
-          setAppSource(_app.id, 'store')
-          navigate(`/application/${_app.id}`)
+          setAppSource(_app.key, 'store')
+          navigate(`/application/${encodeURIComponent(_app.key)}`)
           break
         default:
           break
@@ -84,7 +83,7 @@ const MyApp = () => {
   /** 渲染状态内容（loading/error/empty） */
   const renderStateContent = () => {
     if (loading) {
-      return <Spin size="large" />
+      return <Spin />
     }
 
     if (error) {
@@ -125,9 +124,10 @@ const MyApp = () => {
         mode={ModeEnum.MyApp}
         apps={apps}
         moreBtn={(app) =>
-          app.key === WENSHU_APP_KEY
-            ? undefined
-            : getMyAppMoreBtn(app, (key) => handleMenuClick(key, app))
+          // app.key === WENSHU_APP_KEY
+          //   ? undefined
+          //   :
+          getMyAppMoreBtn(app, (key) => handleMenuClick(key, app))
         }
         onMenuButtonClick={(app) => handleMenuClick(MyAppActionEnum.Use, app)}
       />
@@ -148,7 +148,7 @@ const MyApp = () => {
           <div className="flex items-center gap-x-2">
             <SearchInput onSearch={handleSearch} placeholder="搜索应用" />
             <Tooltip title="刷新">
-              <Button type="text" icon={<ReloadOutlined />} onClick={handleRefresh} />
+              <Button type="text" icon={<IconFont type="icon-refresh" />} onClick={handleRefresh} />
             </Tooltip>
           </div>
         )}

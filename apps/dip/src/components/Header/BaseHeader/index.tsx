@@ -1,13 +1,18 @@
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useMemo } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import logoImage from '@/assets/images/brand/logo.png'
-import InfoIcon from '@/assets/images/info.svg?react'
 import type { HeaderType, SiderType } from '@/routes/types'
-import { getFirstVisibleRouteBySiderType, getParentRoute, getRouteByPath } from '@/routes/utils'
-import { useLanguageStore, useOEMConfigStore, useProjectStore } from '@/stores'
+import {
+  getBreadcrumbAncestorRoutes,
+  getBreadcrumbLinkPathForRoute,
+  getFirstVisibleRouteBySiderType,
+  getRouteByPath,
+  shouldShowCurrentRouteInBreadcrumb,
+} from '@/routes/utils'
+import { useBreadcrumbDetailStore, useLanguageStore, useOEMConfigStore } from '@/stores'
+import { useUserInfoStore } from '@/stores/userInfoStore'
 import type { BreadcrumbItem } from '@/utils/micro-app/globalState'
 import { Breadcrumb } from '../components/Breadcrumb'
-import { ProjectInfoPopover } from '../components/ProjectInfoPopover'
 import { UserInfo } from '../components/UserInfo'
 
 /**
@@ -49,21 +54,24 @@ const getSectionName = (type: HeaderType): string => {
  * 通过路由路径和配置自动判断分类，无需传递 type prop
  */
 const BaseHeader = ({ headerType }: { headerType: HeaderType }) => {
+  const isStudioHeader = headerType === 'studio'
   const location = useLocation()
   const navigate = useNavigate()
   const { getOEMResourceConfig } = useOEMConfigStore()
   const { language } = useLanguageStore()
+  const { isAdmin } = useUserInfoStore()
+  const detailBreadcrumb = useBreadcrumbDetailStore((s) => s.detail)
   const oemResourceConfig = getOEMResourceConfig(language)
-  // 从 store 中获取项目信息
-  const projectInfo = useProjectStore((state) => state.currentProjectInfo)
-  const [projectInfoOpen, setProjectInfoOpen] = useState(false)
 
-  // 不同平台（store/studio）各自的首路由，用于面包屑首页返回
+  // 不同平台（store）各自的首路由，用于面包屑首页返回
   const roleIds = useMemo(() => new Set<string>([]), [])
   const homePath = useMemo(() => {
     const firstRoute = getFirstVisibleRouteBySiderType(headerType as SiderType, roleIds)
+    if (!isAdmin && headerType === 'studio') {
+      return '/home'
+    }
     const path =
-      firstRoute?.path ?? (headerType === 'store' ? 'store/my-app' : 'studio/project-management')
+      firstRoute?.path ?? (headerType === 'store' ? 'store/my-app' : 'digital-human/management')
     return `/${path}`
   }, [headerType, roleIds])
 
@@ -79,46 +87,60 @@ const BaseHeader = ({ headerType }: { headerType: HeaderType }) => {
   // 获取当前路由配置
   const currentRoute = useMemo(() => getRouteByPath(location.pathname), [location.pathname])
 
-  // 检查是否是项目详情路由
-  const isProjectDetailRoute = currentRoute?.path === 'studio/project-management/:projectId'
+  const breadcrumbMode = (location.state as { breadcrumbMode?: string } | null)?.breadcrumbMode
+  const isInitialConfigOnlyMode =
+    currentRoute?.key === 'initial-configuration' && breadcrumbMode === 'init-only'
 
   // 构建面包屑数据：BaseHeaderType名称 / 父路由名称 / 当前路由名称
   const breadcrumbItems: BreadcrumbItem[] = useMemo(() => {
     const result: BreadcrumbItem[] = []
 
-    // BaseHeaderType 名称（只显示，不可点击）
-    const sectionName = getSectionName(headerType)
-    result.push({
-      key: `section-${headerType}`,
-      name: sectionName,
-      disabled: true,
-    })
+    if (!isInitialConfigOnlyMode) {
+      // BaseHeaderType 名称（只显示，不可点击）
+      const sectionName = getSectionName(headerType)
+      result.push({
+        key: `section-${headerType}`,
+        name: sectionName,
+        disabled: true,
+      })
+    }
 
-    // 查找父路由（如果存在）
     if (currentRoute) {
-      const parentRoute = getParentRoute(currentRoute)
-      if (parentRoute?.label) {
-        result.push({
-          key: parentRoute.key || `route-${parentRoute.path}`,
-          name: parentRoute.label,
-          path: parentRoute.path ? `/${parentRoute.path}` : undefined,
-        })
+      const customAncestors =
+        detailBreadcrumb && detailBreadcrumb.routeKey === currentRoute.key
+          ? detailBreadcrumb.replaceAncestorRoutes
+          : undefined
+
+      if (!isInitialConfigOnlyMode) {
+        if (customAncestors?.length) {
+          for (const item of customAncestors) {
+            result.push({
+              key: item.key,
+              name: item.name,
+              path: item.path,
+            })
+          }
+        } else {
+          const ancestorRoutes = getBreadcrumbAncestorRoutes(currentRoute)
+          for (const ancestor of ancestorRoutes) {
+            if (!ancestor.label) continue
+            result.push({
+              key: ancestor.key || `route-${ancestor.path}`,
+              name: ancestor.label,
+              path: getBreadcrumbLinkPathForRoute(ancestor),
+            })
+          }
+        }
       }
 
-      // 当前路由名称（如果存在）
-      if (currentRoute.label) {
-        // 如果是项目详情路由，使用项目真实名称
-        let displayName = currentRoute.label
-        if (isProjectDetailRoute && projectInfo) {
-          displayName = projectInfo.name
-        }
-
-        // 如果当前路由路径包含动态参数（如 :projectId），使用实际路径
-        // 否则使用路由配置中的路径
+      if (shouldShowCurrentRouteInBreadcrumb(currentRoute) && currentRoute.label) {
+        const dynamicTitle =
+          detailBreadcrumb && currentRoute.key && detailBreadcrumb.routeKey === currentRoute.key
+            ? detailBreadcrumb.title
+            : undefined
+        const displayName = dynamicTitle ?? currentRoute.label
         let routePath: string | undefined
         if (currentRoute.path?.includes(':')) {
-          // 动态路由，使用实际路径
-          // location.pathname 已经是相对于 basename 的路径，React Router 会自动处理
           routePath = location.pathname
         } else if (currentRoute.path) {
           routePath = `/${currentRoute.path}`
@@ -133,7 +155,7 @@ const BaseHeader = ({ headerType }: { headerType: HeaderType }) => {
     }
 
     return result
-  }, [headerType, currentRoute, location.pathname, isProjectDetailRoute, projectInfo])
+  }, [headerType, currentRoute, detailBreadcrumb, location.pathname, isInitialConfigOnlyMode])
 
   const getLogoUrl = () => {
     const base64Image = oemResourceConfig?.['logo.png']
@@ -159,38 +181,37 @@ const BaseHeader = ({ headerType }: { headerType: HeaderType }) => {
           items={breadcrumbItems}
           homePath={homePath}
           onNavigate={handleBreadcrumbNavigate}
-          lastItemSuffix={
-            isProjectDetailRoute && projectInfo ? (
-              <ProjectInfoPopover
-                projectInfo={projectInfo}
-                open={projectInfoOpen}
-                onOpenChange={(open) => {
-                  setProjectInfoOpen(open)
-                }}
-                onClose={() => {
-                  setProjectInfoOpen(false)
-                }}
-                styles={{
-                  container: { padding: '24px 0' },
-                }}
-              >
-                <button
-                  type="button"
-                  className="flex items-center justify-center w-6 h-6 text-[#505050]"
-                  title="查看项目信息"
-                >
-                  <InfoIcon />
-                </button>
-              </ProjectInfoPopover>
-            ) : null
-          }
+          showHomeIcon={!isInitialConfigOnlyMode}
+          // lastItemSuffix={
+          //   isWorkPlanDetailRoute && workPlanInfo ? (
+          //     <ProjectInfoPopover
+          //       projectInfo={workPlanInfo}
+          //       open={workPlanInfoOpen}
+          //       onOpenChange={(open) => {
+          //         setProjectInfoOpen(open)
+          //       }}
+          //       onClose={() => {
+          //         setProjectInfoOpen(false)
+          //       }}
+          //       styles={{
+          //         container: { padding: '24px 0' },
+          //       }}
+          //     >
+          //       <button
+          //         type="button"
+          //         className="flex items-center justify-center w-6 h-6 text-[#505050]"
+          //         title="查看项目信息"
+          //       >
+          //         <InfoIcon />
+          //       </button>
+          //     </ProjectInfoPopover>
+          //   ) : null
+          // }
         />
       </div>
 
       {/* 右侧：用户信息 */}
-      <div className="flex items-center gap-x-4 h-full">
-        <UserInfo />
-      </div>
+      <div className="flex items-center gap-x-4 h-full">{isStudioHeader ? null : <UserInfo />}</div>
     </>
   )
 }

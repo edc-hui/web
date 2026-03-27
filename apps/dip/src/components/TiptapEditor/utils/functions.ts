@@ -1,11 +1,11 @@
-import { AnyExtension, Extension, Mark, Node } from "@tiptap/core";
+import type { AnyExtension, Extension, Mark, Node } from '@tiptap/core'
 
 export function debounce<A extends any[]>(delay: number, apply: (...args: A) => void) {
-  let timer: number | undefined;
+  let timer: number | undefined
   return (...args: A) => {
-    clearTimeout(timer);
-    timer = setTimeout(() => apply(...args), delay) as unknown as number;
-  };
+    clearTimeout(timer)
+    timer = setTimeout(() => apply(...args), delay) as unknown as number
+  }
 }
 
 export function configure<O = any>(
@@ -15,11 +15,10 @@ export function configure<O = any>(
   overwrite?: Partial<O>,
 ) {
   if (options !== false) {
-    if (typeof options === "boolean") {
-      extensions.push(node.configure(overwrite));
+    if (typeof options === 'boolean') {
+      extensions.push(node.configure(overwrite))
     } else {
-      extensions.push(node.configure({ ...overwrite, ...options }));
+      extensions.push(node.configure({ ...overwrite, ...options }))
     }
   }
 }
-

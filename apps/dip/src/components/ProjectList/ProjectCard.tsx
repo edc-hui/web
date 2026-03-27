@@ -15,7 +15,7 @@ interface ProjectCardProps {
   onCardClick?: (project: Project) => void
 }
 
-const ProjectCard: React.FC<ProjectCardProps> = ({ project, width, menuItems, onCardClick }) => {
+const ProjectCard: React.FC<ProjectCardProps> = ({ project, menuItems, onCardClick }) => {
   const [menuOpen, setMenuOpen] = useState(false)
 
   const updateTime = project.edited_at ? formatTimeSlash(new Date(project.edited_at).getTime()) : ''
@@ -67,7 +67,7 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, width, menuItems, on
         <div className="flex items-center justify-between">
           {/* 更新信息 */}
           <div className="flex items-center text-xs text-[var(--dip-text-color-45)]">
-            {/* <Avatar size={24} className="flex-shrink-0 mr-2">
+            {/* <Avatar size="small" className="flex-shrink-0 mr-2">
               {userName.charAt(0)}
             </Avatar>
             <span
@@ -101,7 +101,7 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, width, menuItems, on
                     : 'opacity-0 invisible group-hover:opacity-100 group-hover:visible',
                 )}
               >
-                <IconFont type="icon-dip-gengduo" />
+                <IconFont type="icon-more" />
               </button>
             </Dropdown>
           )}

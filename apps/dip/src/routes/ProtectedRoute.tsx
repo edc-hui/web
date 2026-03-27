@@ -1,7 +1,6 @@
 import { Spin } from 'antd'
 import { useEffect, useRef } from 'react'
 import { Navigate, useLocation, useNavigate } from 'react-router-dom'
-import GradientContainer from '@/components/GradientContainer'
 import { getFullPath } from '@/utils/config'
 import { getAccessToken, setAccessToken } from '@/utils/http/token-config'
 import { usePreferenceStore, useUserInfoStore } from '../stores'
@@ -136,7 +135,13 @@ export const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
   useEffect(() => {
     const refresh = () => {
       if (!skipAuth && token && userInfo) {
-        fetchPinnedMicroApps()
+        const pathname = location.pathname
+        const inMicroAppModule = pathname.startsWith('/application/')
+        const inAiStoreModule = pathname.startsWith('/store/')
+
+        if (inMicroAppModule || inAiStoreModule) {
+          fetchPinnedMicroApps()
+        }
       }
     }
 
@@ -148,7 +153,7 @@ export const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
     return () => {
       window.removeEventListener('focus', refresh)
     }
-  }, [skipAuth, token, userInfo, fetchPinnedMicroApps])
+  }, [skipAuth, token, userInfo, fetchPinnedMicroApps, location.pathname])
 
   // 如果跳过认证，直接返回子组件
   if (skipAuth) {
@@ -182,9 +187,9 @@ export const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
 
   if (shouldShowLoading) {
     return (
-      <GradientContainer className="w-full h-full flex items-center justify-center">
-        <Spin size="large" />
-      </GradientContainer>
+      <div className="w-full h-full flex items-center justify-center">
+        <Spin />
+      </div>
     )
   }
 

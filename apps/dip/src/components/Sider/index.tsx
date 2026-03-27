@@ -2,9 +2,11 @@ import { Layout } from 'antd'
 import clsx from 'classnames'
 import { useEffect, useState } from 'react'
 import type { SiderType } from '@/routes/types'
-import BaseSider from './BaseSider'
+import { useUserInfoStore } from '@/stores/userInfoStore'
+import AdminSider from './AdminSider'
 import HomeSider from './HomeSider'
 import styles from './index.module.less'
+import StoreSider from './StoreSider'
 
 const { Sider: AntdSider } = Layout
 
@@ -21,9 +23,10 @@ interface SiderProps {
 
 /**
  * 侧边栏主组件
- * 根据 type 选择渲染 BaseSider（store/studio）或 MicroAppSider（micro-app）
+ * 根据 type 选择渲染 HomeSider（home/studio）或 StoreSider（store）
  */
 const Sider = ({ collapsed, onCollapse, topOffset = 0, type = 'home' }: SiderProps) => {
+  const isAdmin = useUserInfoStore((s) => s.isAdmin)
   const [transitionEnabled, setTransitionEnabled] = useState(false)
   useEffect(() => {
     const t = requestAnimationFrame(() => {
@@ -52,10 +55,14 @@ const Sider = ({ collapsed, onCollapse, topOffset = 0, type = 'home' }: SiderPro
         bottom: 0,
       }}
     >
-      {type === 'home' ? (
-        <HomeSider collapsed={collapsed} onCollapse={onCollapse} />
+      {type === 'home' || type === 'studio' ? (
+        isAdmin ? (
+          <AdminSider collapsed={collapsed} onCollapse={onCollapse} siderType={type} />
+        ) : (
+          <HomeSider collapsed={collapsed} onCollapse={onCollapse} siderType={type} />
+        )
       ) : (
-        <BaseSider collapsed={collapsed} onCollapse={onCollapse} type={type} />
+        <StoreSider collapsed={collapsed} onCollapse={onCollapse} />
       )}
     </AntdSider>
   )

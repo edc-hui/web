@@ -17,21 +17,28 @@ const wrapMap: { [node: string]: string[] } = {
 }
 
 function detachedDoc() {
-  return _detachedDoc || (_detachedDoc = document.implementation.createHTMLDocument('title'))
+  if (!_detachedDoc) {
+    _detachedDoc = document.implementation.createHTMLDocument('title')
+  }
+  return _detachedDoc
 }
 
 export function serializeForClipboard(view: EditorView, slice: Slice) {
-  const context = []
+  const context: Array<string | Record<string, unknown> | null> = []
   let { openStart, openEnd, content } = slice
   while (
     openStart > 1 &&
     openEnd > 1 &&
     content.childCount === 1 &&
-    content.firstChild!.childCount === 1
+    content.firstChild !== null &&
+    content.firstChild.childCount === 1
   ) {
     openStart -= 1
     openEnd -= 1
-    const node = content.firstChild!
+    const node = content.firstChild
+    if (!node) {
+      break
+    }
     context.push(
       node.type.name,
       node.attrs !== (node.type as NodeType & { defaultAttrs: unknown }).defaultAttrs
@@ -48,14 +55,13 @@ export function serializeForClipboard(view: EditorView, slice: Slice) {
   wrap.appendChild(serializer.serializeFragment(content, { document: doc }))
 
   let firstChild = wrap.firstChild
-  let needsWrap
+  let needsWrap: string[] | undefined
   let wrappers = 0
-  // biome-ignore lint: legacy code from tiptap-starter-kit
-  while (
-    firstChild &&
-    firstChild.nodeType === 1 &&
-    (needsWrap = wrapMap[firstChild.nodeName.toLowerCase()])
-  ) {
+  while (firstChild && firstChild.nodeType === 1 && !!wrapMap[firstChild.nodeName.toLowerCase()]) {
+    needsWrap = wrapMap[firstChild.nodeName.toLowerCase()]
+    if (!needsWrap) {
+      break
+    }
     for (let i = needsWrap.length - 1; i >= 0; i--) {
       const wrapper = doc.createElement(needsWrap[i] as string)
       while (wrap.firstChild) wrapper.appendChild(wrap.firstChild)

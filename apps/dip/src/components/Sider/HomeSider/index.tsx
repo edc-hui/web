@@ -1,28 +1,32 @@
-import { PushpinOutlined } from '@ant-design/icons'
 import type { MenuProps } from 'antd'
-import { Menu, message, Popover, Tooltip } from 'antd'
+import { Menu, Modal, message, Tooltip } from 'antd'
 import clsx from 'classnames'
-import { useCallback, useMemo } from 'react'
-import { useLocation, useNavigate } from 'react-router-dom'
+import { useCallback, useEffect, useMemo } from 'react'
+import { createSearchParams, useLocation, useNavigate } from 'react-router-dom'
 import logoImage from '@/assets/images/brand/logo.png'
-import SidebarAiStoreIcon from '@/assets/images/sider/aiStore.svg?react'
-import SidebarDipStudioIcon from '@/assets/images/sider/dipStudio.svg?react'
-import SidebarSystemIcon from '@/assets/images/sider/proton.svg?react'
-import { getFirstVisibleRouteBySiderType } from '@/routes/utils'
-import { useMicroAppStore, usePreferenceStore } from '@/stores'
+import { routeConfigs } from '@/routes/routes'
+import type { RouteConfig, SiderType } from '@/routes/types'
+import { getRouteByPath, getRouteSidebarMode, isRouteVisibleForRoles } from '@/routes/utils'
 import { useLanguageStore } from '@/stores/languageStore'
 import { useOEMConfigStore } from '@/stores/oemConfigStore'
-import { getFullPath } from '@/utils/config'
-import { getAccessToken, getRefreshToken } from '@/utils/http/token-config'
-import AppIcon from '../../AppIcon'
+import { useUserHistoryStore } from '@/stores/userHistoryStore'
+import { useUserWorkPlanStore } from '@/stores/userWorkPlanStore'
 import IconFont from '../../IconFont'
+import { ExternalLinksMenu } from '../components/ExternalLinksMenu'
+import { MaskIcon } from '../components/GradientMaskIcon'
+import { HistorySection } from '../components/HistorySection'
 import { UserMenuItem } from '../components/UserMenuItem'
+import { WorkPlanSection } from '../components/WorkPlanSection'
 
 interface HomeSiderProps {
   /** 是否折叠 */
   collapsed: boolean
   /** 折叠状态改变回调 */
   onCollapse: (collapsed: boolean) => void
+  /**
+   * 与布局一致：`home` 展示 Logo + 外链；`studio`（DIP Studio）不展示
+   */
+  siderType?: SiderType
 }
 
 /**
@@ -31,160 +35,185 @@ interface HomeSiderProps {
  * - 负责渲染：Logo + 折叠按钮 + 用户信息
  * - 显示路由菜单项、钉住的应用、外部链接等
  */
-const HomeSider = ({ collapsed, onCollapse }: HomeSiderProps) => {
+const HomeSider = ({ collapsed, onCollapse, siderType = 'home' }: HomeSiderProps) => {
+  const isHomeSider = siderType === 'home'
   const navigate = useNavigate()
   const location = useLocation()
-  const [messageApi, messageContextHolder] = message.useMessage()
-  const { pinnedMicroApps, unpinMicroApp, wenshuAppInfo } = usePreferenceStore()
-  const { setAppSource } = useMicroAppStore()
+  const [, messageContextHolder] = message.useMessage()
+  const [modal, modalContextHolder] = Modal.useModal()
+  const {
+    plans,
+    total,
+    fetchPlans,
+    refreshPlansOnFocus,
+    pausePlan,
+    resumePlan,
+    deletePlan,
+    selectedPlanId,
+    setSelectedPlanId,
+  } = useUserWorkPlanStore()
+  const {
+    sessions: historySessions,
+    total: historyTotal,
+    fetchSessions,
+    refreshSessionsOnFocus,
+    selectedSessionKey,
+    setSelectedSessionKey,
+    deleteHistorySession,
+  } = useUserHistoryStore()
   const { language } = useLanguageStore()
   const { getOEMResourceConfig } = useOEMConfigStore()
   const oemResourceConfig = getOEMResourceConfig(language)
   // TODO: 角色信息需要从其他地方获取，暂时使用空数组
   const roleIds = useMemo(() => new Set<string>([]), [])
 
-  const handleOpenApp = useCallback(
-    (appId: number) => {
-      // 记录来源类型，并在容器中根据 Store 读取，不再依赖 URL 参数
-      setAppSource(appId, 'home')
-      navigate(`/application/${appId}`)
+  /** 新建会话 */
+  const handleCreateSession = () => {
+    navigate('/home')
+  }
+  const handleOpenPlanDetail = useCallback(
+    (planId: string, _agentId: string, sessionId: string) => {
+      navigate({
+        pathname: `/work-plan/${planId}`,
+        search: `?${createSearchParams({
+          sessionKey: sessionId,
+        })}`,
+      })
     },
-    [navigate, setAppSource],
+    [navigate],
   )
 
-  const handleUnpin = useCallback(
-    async (appId: number) => {
-      try {
-        await unpinMicroApp(appId)
-        messageApi.success('已取消钉住')
-      } catch (error) {
-        console.error('Failed to unpin micro app:', error)
-        messageApi.error('取消钉住失败，请稍后重试')
+  /** 根据当前路由确定选中的菜单项 */
+  const getSelectedKey = useCallback(() => {
+    const pathname = location.pathname
+    if (pathname === '/') {
+      return 'home'
+    }
+
+    const route = getRouteByPath(pathname)
+    return route?.key || 'home'
+  }, [location.pathname])
+
+  const selectedKey = getSelectedKey()
+  /** 与菜单选中一致：仅 home、studio/conversation 为「会话」主按钮（深色） */
+  const isSessionRouteActive = selectedKey === 'home' || selectedKey === 'studio-conversation'
+  const topPlans = useMemo(() => plans.slice(0, 5), [plans])
+  const hasPlanMore = total > 5
+  const topHistorySessions = useMemo(() => historySessions.slice(0, 5), [historySessions])
+  const hasHistoryMore = historyTotal > 5
+
+  useEffect(() => {
+    void fetchPlans()
+  }, [fetchPlans])
+  useEffect(() => {
+    void fetchSessions()
+  }, [fetchSessions])
+
+  useEffect(() => {
+    const match = location.pathname.match(/^\/history\/([^/]+)$/)
+    setSelectedSessionKey(match ? decodeURIComponent(match[1]) : undefined)
+  }, [location.pathname, setSelectedSessionKey])
+
+  useEffect(() => {
+    const match = location.pathname.match(/^\/work-plan\/([^/]+)$/)
+    setSelectedPlanId(match ? decodeURIComponent(match[1]) : undefined)
+  }, [location.pathname, setSelectedPlanId])
+
+  useEffect(() => {
+    const handleWindowFocus = () => {
+      void refreshPlansOnFocus()
+      void refreshSessionsOnFocus()
+    }
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        void refreshPlansOnFocus()
+        void refreshSessionsOnFocus()
       }
-    },
-    [unpinMicroApp],
-  )
+    }
+    window.addEventListener('focus', handleWindowFocus)
+    document.addEventListener('visibilitychange', handleVisibilityChange)
+    return () => {
+      window.removeEventListener('focus', handleWindowFocus)
+      document.removeEventListener('visibilitychange', handleVisibilityChange)
+    }
+  }, [refreshPlansOnFocus, refreshSessionsOnFocus])
 
-
+  /** 菜单项 */
   const menuItems = useMemo<MenuProps['items']>(() => {
+    const hasKey = (route: RouteConfig): route is RouteConfig & { key: string } => {
+      return Boolean(route.key)
+    }
+
+    const visibleSidebarRoutes = routeConfigs
+      .filter((route) => getRouteSidebarMode(route) === 'menu' && route.key)
+      .filter((route) => isRouteVisibleForRoles(route, roleIds))
+      .filter((route) => route.handle?.layout?.siderType === 'studio')
+      .filter(hasKey)
+
     const items: MenuProps['items'] = []
 
-    // 问数应用始终排在第一位（若存在）
-    if (wenshuAppInfo) {
-      items.push({
-        key: `micro-app-${wenshuAppInfo.id}`,
-        label: wenshuAppInfo.name,
-        icon: (
-          <AppIcon icon={wenshuAppInfo.icon} name={wenshuAppInfo.name} size={16} shape="square" />
-        ),
-        onClick: () => handleOpenApp(wenshuAppInfo.id),
-      })
-    }
+    // 第一组：普通数字员工路由，按 group 分组展示
+    const groupMap = new Map<string, NonNullable<MenuProps['items']>>()
+    const groupedRouteOrder: string[] = []
 
-    // 钉住的应用（排除问数，避免重复）
-    pinnedMicroApps
-      .filter((app) => app.id !== wenshuAppInfo?.id)
-      .forEach((app) => {
-        items.push({
-          key: `micro-app-${app.id}`,
-          label: (
-            <div className="w-full h-full flex justify-between items-center">
-              {app.name}
-              <Popover content="取消固定">
-                <PushpinOutlined
-                  className="w-6 h-6 text-base flex items-center justify-center rounded text-[var(--dip-warning-color)] pin-icon opacity-0 hover:bg-[rgba(0,0,0,0.04)]"
-                  onClick={(e) => {
-                    e.stopPropagation()
-                    handleUnpin(app.id)
-                  }}
-                />
-              </Popover>
-            </div>
-          ),
-          icon: <AppIcon icon={app.icon} name={app.name} size={16} shape="square" />,
-          onClick: () => handleOpenApp(app.id),
-        })
+    visibleSidebarRoutes.forEach((route) => {
+      if (!route.key) return
+
+      const item: Exclude<MenuProps['items'], undefined>[number] = {
+        key: route.key,
+        label: route.label || route.key,
+        icon: route.iconUrl ? (
+          <MaskIcon
+            url={route.iconUrl}
+            className="w-4 h-4"
+            background={
+              selectedKey === route.key
+                ? 'linear-gradient(210deg, #1C4DFA 0%, #3FA9F5 100%)'
+                : '#333333'
+            }
+          />
+        ) : null,
+        onClick: () => {
+          if (route.path) {
+            navigate(`/${route.path}`)
+          }
+        },
+      }
+
+      if (!route.group) {
+        // 无 group 的路由直接平铺
+        items.push(item)
+        return
+      }
+
+      if (!groupMap.has(route.group)) {
+        groupMap.set(route.group, [])
+        groupedRouteOrder.push(route.group)
+      }
+      const groupChildren = groupMap.get(route.group)
+      if (groupChildren) {
+        groupChildren.push(item)
+      }
+    })
+
+    groupedRouteOrder.forEach((groupName) => {
+      const children = groupMap.get(groupName)
+      if (!children || children.length === 0) return
+
+      // 分组标题作为一个普通、不可点击的菜单项，后面紧跟该分组下的子项，整体平铺展示
+      items.push({
+        key: `group-${groupName}`,
+        label: groupName,
+        type: 'group',
       })
+
+      children.forEach((child) => {
+        items.push(child)
+      })
+    })
 
     return items
-  }, [pinnedMicroApps, handleOpenApp, handleUnpin, wenshuAppInfo])
-
-  const externalMenuItems = useMemo<MenuProps['items']>(() => {
-    const firstStoreRoute = getFirstVisibleRouteBySiderType('store', roleIds)
-    const firstStudioRoute = getFirstVisibleRouteBySiderType('studio', roleIds)
-    const baseOrigin = window.location.origin
-    const getExternalUrl = (path: string) => `${baseOrigin}${path}`
-
-    const storePath = `/${firstStoreRoute?.path || 'store/my-app'}`
-    const studioPath = `/${firstStudioRoute?.path || 'studio/project-management'}`
-
-    const storeHref = getFullPath(storePath)
-    const studioHref = getFullPath(studioPath)
-
-    // 业务知识网络单点登录参数
-    const redirectUrl = '/studio/home'
-    const token = getAccessToken()
-    const refreshToken = getRefreshToken()
-    const ssoSearchParams = new URLSearchParams({
-      redirect_url: redirectUrl,
-      product: 'adp',
-    })
-    if (token) {
-      if (process.env.NODE_ENV === 'development') {
-        ssoSearchParams.set(
-          'token',
-          'ory_at_1Ol1cd_wZVPwYNCr50AiR9dctvUvM1_mI2C-f481n6Y.uikVUF3c1Rf5KFBivT8JbYDE6VDFLplv_1KRiihWqWU',
-        )
-        ssoSearchParams.set(
-          'refreshToken',
-          'ory_rt_b1VBSySehSNQro5ZPZPTxScOEYVkNwaVpzTVk0tgCZI.8lJkppPN97yZSGWTlZOSxqz3fpoTg0dKTR8MwCWr5Uo',
-        )
-      } else {
-        ssoSearchParams.set('token', token)
-        ssoSearchParams.set('refreshToken', refreshToken)
-      }
-    }
-    const ssoUrl = `${baseOrigin}/interface/studioweb/internalSSO?${ssoSearchParams.toString()}`
-
-    return [
-      {
-        key: 'ai-store',
-        label: (
-          <a href={storeHref} target="_blank" rel="noopener noreferrer">
-            AI Store
-          </a>
-        ),
-        icon: <SidebarAiStoreIcon />,
-      },
-      {
-        key: 'dip-studio',
-        label: (
-          <a href={studioHref} target="_blank" rel="noopener noreferrer">
-            DIP Studio
-          </a>
-        ),
-        icon: <SidebarDipStudioIcon />,
-      },
-      {
-        key: 'data-platform',
-        label: (
-          <a href={ssoUrl} target="_blank" rel="noopener noreferrer">
-            业务知识网络
-          </a>
-        ),
-        icon: <IconFont type="icon-yewuzhishiwangluo" />,
-      },
-      {
-        key: 'system',
-        label: (
-          <a href={getExternalUrl('/deploy')} target="_blank" rel="noopener noreferrer">
-            系统工作台
-          </a>
-        ),
-        icon: <SidebarSystemIcon />,
-      },
-    ]
-  }, [roleIds])
+  }, [roleIds, selectedKey, navigate])
 
   // 获取 OEM logo，如果获取不到则使用默认 logo
   const logoUrl = useMemo(() => {
@@ -200,41 +229,39 @@ const HomeSider = ({ collapsed, onCollapse }: HomeSiderProps) => {
     return `data:image/png;base64,${base64Image}`
   }, [oemResourceConfig])
 
-  const selectedKeys = useMemo(() => {
-    const path = location.pathname
-    const match = path.match(/^\/application\/(\d+)/)
-    if (!match) {
-      return []
-    }
-
-    const appId = Number(match[1])
-    const key = `micro-app-${appId}`
-
-    const exists =
-      (wenshuAppInfo && wenshuAppInfo.id === appId) ||
-      pinnedMicroApps.some((app) => app.id === appId)
-
-    return exists ? [key] : []
-  }, [location.pathname, pinnedMicroApps, wenshuAppInfo])
-
   return (
     <div className="flex flex-col h-full px-0 pt-4 pb-1 overflow-hidden">
       {messageContextHolder}
-      {/* logo + 收缩按钮 */}
-      <div
-        className={clsx(
-          'flex items-center gap-2 pb-4',
-          collapsed ? 'justify-center pl-1.5 pr-1.5' : 'justify-between pl-3 pr-2',
-        )}
-      >
-        <img src={logoUrl} alt="logo" className={clsx('h-8 w-auto', collapsed && 'hidden')} />
-        <Tooltip title={collapsed ? '展开' : '收起'} placement="right">
+      {modalContextHolder}
+      {/* logo：仅 home 布局；DIP Studio（studio）不展示 */}
+      {isHomeSider ? (
+        <div
+          className={clsx(
+            'flex items-center gap-2 pb-4',
+            collapsed ? 'justify-center pl-1.5 pr-1.5' : 'justify-between pl-3 pr-2',
+          )}
+        >
+          <img src={logoUrl} alt="logo" className={clsx('h-8 w-auto', collapsed && 'hidden')} />
+        </div>
+      ) : null}
+
+      {/* 新建会话按钮 */}
+      <div className={clsx('flex items-center pb-3 px-1.5')}>
+        <Tooltip title={collapsed ? '会话' : ''} placement="right">
           <button
             type="button"
-            className="text-sm cursor-pointer flex items-center justify-center w-8 h-8 rounded-md text-[--dip-text-color] hover:text-[--dip-primary-color]"
-            onClick={() => onCollapse(!collapsed)}
+            onClick={handleCreateSession}
+            className={clsx(
+              `w-full h-8 flex justify-center items-center gap-x-2 rounded`,
+              isSessionRouteActive
+                ? 'bg-[--dip-primary-color] text-white'
+                : collapsed
+                  ? 'text-[--dip-text-color] hover:bg-[--dip-hover-bg-color-6]'
+                  : 'bg-[#EBF4FF] text-[--dip-primary-color]',
+            )}
           >
-            <IconFont type="icon-dip-cebianlan" />
+            <IconFont type="icon-add" />
+            {collapsed ? '' : '会话'}
           </button>
         </Tooltip>
       </div>
@@ -244,27 +271,99 @@ const HomeSider = ({ collapsed, onCollapse }: HomeSiderProps) => {
         <div className="flex-1">
           <Menu
             mode="inline"
-            selectedKeys={selectedKeys}
+            selectedKeys={[selectedKey]}
             items={menuItems}
             inlineCollapsed={collapsed}
             selectable
           />
-        </div>
 
-        {/* 外链菜单内容 */}
-        <div className="shrink-0">
-          <Menu
-            mode="inline"
-            selectedKeys={[]}
-            items={externalMenuItems}
-            inlineCollapsed={collapsed}
-            selectable={false}
-          />
+          {!collapsed && topPlans.length > 0 ? (
+            <WorkPlanSection
+              plans={topPlans}
+              hasMore={hasPlanMore}
+              total={plans.length}
+              selectedPlanId={selectedPlanId}
+              onMore={() => navigate('/work-plan')}
+              onOpenPlanDetail={(planId, agentId, sessionId) => {
+                setSelectedPlanId(planId)
+                handleOpenPlanDetail(planId, agentId, sessionId)
+              }}
+              onPausePlan={pausePlan}
+              onResumePlan={resumePlan}
+              onDeletePlan={deletePlan}
+            />
+          ) : null}
+
+          {!collapsed && topHistorySessions.length > 0 ? (
+            <HistorySection
+              sessions={topHistorySessions}
+              hasMore={hasHistoryMore}
+              total={historySessions.length}
+              selectedSessionKey={selectedSessionKey}
+              onMore={() => navigate('/history')}
+              onOpenHistoryDetail={(sessionKey) => {
+                setSelectedSessionKey(sessionKey)
+                navigate(`/history/${sessionKey}`)
+              }}
+              onDeleteHistory={(session) => {
+                modal.confirm({
+                  title: '确认删除',
+                  content: '删除后将无法恢复，是否继续？',
+                  okText: '确定',
+                  okType: 'primary',
+                  okButtonProps: { danger: true },
+                  cancelText: '取消',
+                  onOk: async () => {
+                    await deleteHistorySession(session.key)
+                  },
+                })
+              }}
+            />
+          ) : null}
         </div>
+        <ExternalLinksMenu collapsed={collapsed} roleIds={roleIds} />
       </div>
 
-      {/* 用户 */}
-      <UserMenuItem collapsed={collapsed} />
+      {collapsed ? null : (
+        <div className="mx-3 my-2 h-px shrink-0 bg-[var(--dip-border-color)]" aria-hidden />
+      )}
+
+      {/* 用户 + 收缩：样式与上方 Menu 项一致（40px 行、边距与 hover） */}
+      {collapsed ? (
+        <div className="dip-sider-footer-stack shrink-0">
+          <div className="dip-sider-footer-row">
+            <Tooltip title="展开" placement="right">
+              <span className="flex min-w-0 flex-1">
+                <button
+                  type="button"
+                  className="flex h-10 min-h-10 w-full min-w-0 cursor-pointer items-center justify-center border-0 bg-transparent p-0 text-[var(--dip-text-color)]"
+                  onClick={() => onCollapse(false)}
+                >
+                  <IconFont type="icon-sidebar" className="text-base leading-none" />
+                </button>
+              </span>
+            </Tooltip>
+          </div>
+          <div className="dip-sider-footer-row">
+            <UserMenuItem collapsed={collapsed} />
+          </div>
+        </div>
+      ) : (
+        <div className="dip-sider-footer-row dip-sider-footer-row-horizontal shrink-0">
+          <div className="min-w-0 flex-1">
+            <UserMenuItem collapsed={collapsed} />
+          </div>
+          <Tooltip title="收起" placement="right">
+            <button
+              type="button"
+              className="flex h-4 w-4 shrink-0 cursor-pointer items-center justify-center border-0 bg-transparent p-0 text-[var(--dip-text-color)] hover:text-[var(--dip-primary-color)]"
+              onClick={() => onCollapse(true)}
+            >
+              <IconFont type="icon-sidebar" className="text-base leading-none" />
+            </button>
+          </Tooltip>
+        </div>
+      )}
     </div>
   )
 }

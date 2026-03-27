@@ -1,10 +1,11 @@
 import { lazy, useEffect, useRef } from 'react'
 import type { RouteObject } from 'react-router-dom'
 import { createBrowserRouter, useNavigate } from 'react-router-dom'
+import { useUserInfoStore } from '@/stores'
+import { getGuideStatus } from '@/apis/dip-studio/guide'
 import { BASE_PATH } from '@/utils/config'
 import { ProtectedRoute } from './ProtectedRoute'
 import { routeConfigs } from './routes'
-import { resolveDefaultMicroAppPath } from './utils'
 
 const Login = lazy(() => import('../pages/Login'))
 const LoginSuccess = lazy(() => import('../pages/Login/LoginSuccess'))
@@ -23,6 +24,7 @@ const LoginFailed = lazy(() => import('../pages/Login/LoginFailed'))
  */
 const DefaultIndexRedirect = () => {
   const navigate = useNavigate()
+  const isAdmin = useUserInfoStore((s) => s.isAdmin)
   const hasNavigatedRef = useRef(false)
 
   useEffect(() => {
@@ -30,14 +32,41 @@ const DefaultIndexRedirect = () => {
       return
     }
 
-    resolveDefaultMicroAppPath().then((targetPath) => {
-      if (hasNavigatedRef.current) {
-        return
+    // TODO: 暂时不使用默认微应用路由
+    // resolveDefaultMicroAppPath().then((targetPath) => {
+    //   if (hasNavigatedRef.current) {
+    //     return
+    //   }
+    //   hasNavigatedRef.current = true
+    //   navigate(targetPath, { replace: true })
+    // })
+
+    void (async () => {
+      try {
+        if (isAdmin) {
+          const guideStatus = await getGuideStatus()
+          hasNavigatedRef.current = true
+          if (guideStatus.ready) {
+            navigate('/digital-human/management', { replace: true })
+            return
+          }
+
+          navigate('/initial-configuration', {
+            replace: true,
+            state: { guideStatus, breadcrumbMode: 'init-only' },
+          })
+          return
+        }
+
+        hasNavigatedRef.current = true
+        navigate('/home', { replace: true })
+      } catch {
+        // 若初始化状态接口失败，避免阻塞管理员进入系统
+        hasNavigatedRef.current = true
+        navigate(isAdmin ? '/digital-human/management' : '/home', { replace: true })
       }
-      hasNavigatedRef.current = true
-      navigate(targetPath, { replace: true })
-    })
-  }, [navigate])
+    })()
+  }, [navigate, isAdmin])
 
   // const { userInfo } = useUserInfoStore()
 
@@ -57,7 +86,7 @@ const DefaultIndexRedirect = () => {
 const generateRoutesFromConfig = (): RouteObject[] => {
   return routeConfigs
     .filter((route) => route.element !== null && route.element !== undefined)
-    .map(({ key, label, iconUrl, showInSidebar, disabled, ...route }) => {
+    .map(({ key, label, iconUrl, sidebarMode, disabled, ...route }) => {
       const { element, path, handle, children } = route
       return {
         path,
@@ -114,7 +143,7 @@ export const router = createBrowserRouter(
         ...generateRoutesFromConfig(),
         // 动态路由（微应用容器）
         {
-          path: 'application/:appId/*',
+          path: 'application/:appKey/*',
           element: <MicroAppContainer />,
           handle: {
             layout: {

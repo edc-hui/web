@@ -37,7 +37,7 @@ function flattenNodeTree(tree: NodeTree | null): Node[] {
   const nodes: Node[] = []
   const visit = (t: NodeTree) => {
     const { children, ...node } = t
-    nodes.push(node as Node)
+    nodes.push(node as unknown as Node)
     children?.forEach(visit)
   }
   visit(tree)

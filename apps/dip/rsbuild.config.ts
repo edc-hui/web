@@ -41,18 +41,18 @@ export default defineConfig({
     // BASE_PATH 不带尾部斜杠（用于路由和路径拼接）
     // 使用项目特定的命名，避免与其他项目冲突（特别是微前端场景）
     define: {
-      'window.__DIP_HUB_BASE_PATH__': JSON.stringify(basePath),
+      "window.__DIP_HUB_BASE_PATH__": JSON.stringify(basePath),
     },
     // 配置 antd 按需加载（antd 6.0 使用 CSS-in-JS，自动按需加载）
     transformImport: [
       {
-        libraryName: 'antd',
-        libraryDirectory: 'es',
+        libraryName: "antd",
+        libraryDirectory: "es",
         style: false, // antd 6.0 使用 CSS-in-JS，不需要加载 CSS
       },
       {
-        libraryName: 'lodash',
-        customName: 'lodash/{{ member }}',
+        libraryName: "lodash",
+        customName: "lodash/{{ member }}",
       },
     ],
   },
@@ -62,31 +62,30 @@ export default defineConfig({
     proxy: {
       // 开发环境：将 API 请求代理到远程服务器
       // 登录相关路由由中间件插件处理，不走代理
-      '/api/dip-hub': {
+      "/api/dip-hub": {
         ...proxyBase,
         // 排除登录相关路由，这些由中间件插件处理
         bypass(req) {
-          const url = req.url || ''
+          const url = req.url || "";
           if (
-            url.includes('/v1/login') ||
-            url.includes('/v1/logout') ||
-            url.includes('/v1/login/callback') ||
-            url.includes('/v1/logout/callback')
+            url.includes("/v1/login") ||
+            url.includes("/v1/logout") ||
+            url.includes("/v1/login/callback") ||
+            url.includes("/v1/logout/callback")
           ) {
             // 返回 false 表示不使用代理，由中间件处理
-            return false
+            return false;
           }
-          return undefined // 其他路由继续使用代理
+          return undefined; // 其他路由继续使用代理
         },
       },
-      '/api/dip-studio':proxyBase,      
-      '/api/mdl-data-model': proxyBase,
-      '/api/agent-factory': proxyBase,
-      '/api/deploy-web-service': proxyBase,
-      '/api/ontology-manager': proxyBase,
+      "/api/dip-studio": proxyBase,
+      "/api/mdl-data-model": proxyBase,
+      "/api/agent-factory": proxyBase,
+      "/api/deploy-web-service": proxyBase,
       // 剩余所有 API 请求代理到 DEBUG_ORIGIN
-      '/api/*': proxyBase,
-      '/oauth2/*': proxyBase,
+      "/api/*": proxyBase,
+      "/oauth2/*": proxyBase,
     },
   },
   plugins: [
@@ -98,17 +97,17 @@ export default defineConfig({
   ],
   html: {
     // 设置页面标题，覆盖 Rsbuild 默认的 "Rsbuild App"
-    title: 'DIP',
+    title: "DIP",
     // 使用 public/dip.png 作为浏览器标签页图标
     // 这里路径相对于项目根目录（public/dip.svg）
-    favicon: 'public/dip.png',
+    favicon: "public/dip.png",
     // 设置根元素 id，避免与微应用的 #root 冲突
-    template: 'public/index.html',
+    template: "public/index.html",
   },
   resolve: {
     alias: {
-      '@': './src',
+      "@": "./src",
     },
-    extensions: ['.tsx', '.ts', '.jsx', '.js', '.json'],
+    extensions: [".tsx", ".ts", ".jsx", ".js", ".json"],
   },
-})
+});
