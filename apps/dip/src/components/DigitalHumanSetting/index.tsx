@@ -37,8 +37,8 @@ const DigitalHumanSetting = ({ readonly }: { readonly?: boolean }) => {
   return (
     <div className="h-full min-h-0 flex flex-col bg-[--dip-white] relative flex-1">
       {messageContextHolder}
-      <div className="flex flex-1 min-h-0 overflow-hidden">
-        <div className="w-60 pl-2 pr-1.5 py-4 bg-[#FFFFFFD9] border-r border-[--dip-border-color] shrink-0">
+      <div className="flex flex-1 min-h-0 overflow-hidden p-6 bg-[#F8FAFC] gap-x-4">
+        <div className="w-60 pl-2 pr-1.5 py-4 bg-[--dip-white] shrink-0 rounded-md">
           <div className="flex flex-col gap-2">
             {deSettingMenuItems.map((item) => (
               <button
@@ -64,7 +64,9 @@ const DigitalHumanSetting = ({ readonly }: { readonly?: boolean }) => {
             ))}
           </div>
         </div>
-        <div className="flex-1 min-w-0 min-h-0 overflow-auto">{renderContent()}</div>
+        <div className="flex-1 min-w-0 min-h-0 overflow-auto rounded-md bg-[--dip-white]">
+          {renderContent()}
+        </div>
       </div>
     </div>
   )

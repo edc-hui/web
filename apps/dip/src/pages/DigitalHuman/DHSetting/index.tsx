@@ -15,6 +15,14 @@ import IconFont from '@/components/IconFont'
 import { useUserInfoStore } from '@/stores/userInfoStore'
 import { formatTimeSlash } from '@/utils/handle-function/FormatTime'
 import { useDigitalHumanPageLoad } from '../useDigitalHumanPageLoad'
+import dh1 from '@/assets/icons/avator/dh_1.svg'
+import dh2 from '@/assets/icons/avator/dh_2.svg'
+import dh3 from '@/assets/icons/avator/dh_3.svg'
+import dh4 from '@/assets/icons/avator/dh_4.svg'
+import dh5 from '@/assets/icons/avator/dh_5.svg'
+import dh6 from '@/assets/icons/avator/dh_6.svg'
+import dh7 from '@/assets/icons/avator/dh_7.svg'
+import dh8 from '@/assets/icons/avator/dh_8.svg'
 
 type DHSettingParams = {
   digitalHumanId?: string
@@ -41,6 +49,20 @@ const DHSetting = () => {
   const [, messageContextHolder] = message.useMessage()
   const [publishing, setPublishing] = useState(false)
   const [deleteModalOpen, setDeleteModalOpen] = useState(false)
+
+  const avatarIconMap: Record<string, string> = {
+    dh_1: dh1,
+    dh_2: dh2,
+    dh_3: dh3,
+    dh_4: dh4,
+    dh_5: dh5,
+    dh_6: dh6,
+    dh_7: dh7,
+    dh_8: dh8,
+  }
+
+  // 创建模式进入时生成一个随机头像 ID（整个页面生命周期内保持不变）
+  const [createAvatarId] = useState<string>(() => `dh_${Math.floor(Math.random() * 8) + 1}`)
 
   const routeId = params.digitalHumanId
   const modeFromQuery = searchParams.get('mode')
@@ -73,6 +95,13 @@ const DHSetting = () => {
   const headerDisplayName =
     uiMode === 'edit' ? (frozenDisplayNameForEdit ?? basic.name).trim() || basic.name : basic.name
 
+  const headerAvatarSrc =
+    uiMode === 'create'
+      ? avatarIconMap[createAvatarId]
+      : detail?.icon_id
+        ? avatarIconMap[detail.icon_id]
+        : undefined
+
   const handlePublish = async () => {
     const name = basic.name.trim()
     if (!name) {
@@ -85,12 +114,11 @@ const DHSetting = () => {
       const creature = basic.creature?.trim() || undefined
       const soul = basic.soul?.trim() || undefined
 
-      const randomAvatarId = `dh_${Math.floor(Math.random() * 8) + 1}`
       const createBody: CreateDigitalHumanRequest = {
         name,
         ...(creature !== undefined ? { creature } : {}),
         ...(soul !== undefined ? { soul } : {}),
-        icon_id: randomAvatarId,
+        icon_id: createAvatarId,
         skills: skills.map((skill) => skill.name),
         bkn,
         ...(channel !== undefined ? { channel } : {}),
@@ -152,20 +180,36 @@ const DHSetting = () => {
           <div className="flex items-center gap-3">
             {uiMode === 'create' ? (
               <>
-                <IconFont
-                  type="icon-object-class"
-                  className="flex-shrink-0 flex items-center justify-center rounded w-6 h-6 bg-[rgb(var(--dip-primary-color-rgb-space)/10%)] text-[var(--dip-primary-color)]"
-                />
+                {headerAvatarSrc ? (
+                  <img
+                    src={headerAvatarSrc}
+                    alt={basic.name}
+                    className="flex-shrink-0 w-8 h-8 rounded-md overflow-hidden object-cover"
+                  />
+                ) : (
+                  <IconFont
+                    type="icon-object-class"
+                    className="flex-shrink-0 flex items-center justify-center rounded w-6 h-6 bg-[rgb(var(--dip-primary-color-rgb-space)/10%)] text-[var(--dip-primary-color)]"
+                  />
+                )}
                 <span className="font-medium text-[--dip-text-color]">新建数字员工</span>
               </>
             ) : routeId ? (
               <>
-                <AppIcon
-                  name={headerDisplayName}
-                  size={32}
-                  className="w-8 h-8 rounded-md overflow-hidden"
-                  shape="square"
-                />
+                {headerAvatarSrc ? (
+                  <img
+                    src={headerAvatarSrc}
+                    alt={headerDisplayName}
+                    className="w-8 h-8 rounded-md overflow-hidden object-cover"
+                  />
+                ) : (
+                  <AppIcon
+                    name={headerDisplayName}
+                    size={32}
+                    className="w-8 h-8 rounded-md overflow-hidden"
+                    shape="square"
+                  />
+                )}
                 <div className="flex flex-col gap-0.5">
                   <span className="font-medium text-[--dip-text-color]">{headerDisplayName}</span>
                   {detail?.updated_at && (

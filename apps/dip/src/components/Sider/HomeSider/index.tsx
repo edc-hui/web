@@ -3,7 +3,6 @@ import { Menu, Modal, message, Tooltip } from 'antd'
 import clsx from 'classnames'
 import { useCallback, useEffect, useMemo } from 'react'
 import { createSearchParams, useLocation, useNavigate } from 'react-router-dom'
-import logoImage from '@/assets/images/brand/logo.png'
 import { routeConfigs } from '@/routes/routes'
 import type { RouteConfig, SiderType } from '@/routes/types'
 import { getRouteByPath, getRouteSidebarMode, isRouteVisibleForRoles } from '@/routes/utils'
@@ -217,16 +216,7 @@ const HomeSider = ({ collapsed, onCollapse, siderType = 'home' }: HomeSiderProps
 
   // 获取 OEM logo，如果获取不到则使用默认 logo
   const logoUrl = useMemo(() => {
-    const base64Image = oemResourceConfig?.['logo.png']
-    if (!base64Image) {
-      return logoImage
-    }
-    // 如果已经是 data URL 格式，直接使用
-    if (base64Image.startsWith('data:image/')) {
-      return base64Image
-    }
-    // 否则添加 base64 前缀
-    return `data:image/png;base64,${base64Image}`
+    return oemResourceConfig?.['logo.png']
   }, [oemResourceConfig])
 
   return (

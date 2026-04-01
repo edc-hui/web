@@ -114,7 +114,7 @@ const ChannelConfig = ({ readonly }: ChannelConfigProps) => {
         rowKey={(record) => `${record.type ?? 'feishu'}-${record.appId}`}
         bordered={false}
         size="small"
-        scroll={{ y: 'max(246px, calc(100vh - 326px))' }}
+        scroll={{ y: 'max(246px, calc(100vh - 299px))' }}
         locale={{
           emptyText: (
             <Empty type="empty" title="暂无通道">

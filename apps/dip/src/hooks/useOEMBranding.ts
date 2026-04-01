@@ -41,16 +41,14 @@ export const useOEMBranding = () => {
     const favicon = oemBasicConfig?.['favicon.ico']
     if (!favicon) return
 
-    // 处理后端返回的 favicon：可能是完整 dataURL，也可能是纯 base64
-    const href = favicon.startsWith('data:') ? favicon : `data:image/x-icon;base64,${favicon}`
-
     let link = document.querySelector<HTMLLinkElement>("link[rel='icon']")
     if (!link) {
       link = document.createElement('link')
       link.rel = 'icon'
       document.head.appendChild(link)
     }
-    link.href = href
+    // 项目内直接引用的图片资源，打包后会是完整 URL，直接赋值即可
+    link.href = favicon
   }, [oemBasicConfig?.['favicon.ico']])
 
   // // 根据当前路由所属侧边栏分类，设置 favicon（使用 public 目录下的静态资源）

@@ -1,6 +1,5 @@
 import { useCallback, useMemo } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
-import logoImage from '@/assets/images/brand/logo.png'
 import type { HeaderType, SiderType } from '@/routes/types'
 import {
   getBreadcrumbAncestorRoutes,
@@ -158,16 +157,7 @@ const BaseHeader = ({ headerType }: { headerType: HeaderType }) => {
   }, [headerType, currentRoute, detailBreadcrumb, location.pathname, isInitialConfigOnlyMode])
 
   const getLogoUrl = () => {
-    const base64Image = oemResourceConfig?.['logo.png']
-    if (!base64Image) {
-      return logoImage
-    }
-    // 如果已经是 data URL 格式，直接使用
-    if (base64Image.startsWith('data:image/')) {
-      return base64Image
-    }
-    // 否则添加 base64 前缀
-    return `data:image/png;base64,${base64Image}`
+    return oemResourceConfig?.['logo.png']
   }
   const logoUrl = getLogoUrl()
 

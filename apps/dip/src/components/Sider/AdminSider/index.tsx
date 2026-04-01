@@ -3,7 +3,6 @@ import { Menu, message, Tooltip } from 'antd'
 import clsx from 'classnames'
 import { useCallback, useMemo } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
-import logoImage from '@/assets/images/brand/logo.png'
 import { routeConfigs } from '@/routes/routes'
 import type { SiderType } from '@/routes/types'
 import { getRouteByPath } from '@/routes/utils'
@@ -65,10 +64,7 @@ const AdminSider = ({ collapsed, onCollapse, siderType = 'home' }: AdminSiderPro
   }, [selectedKey, navigate])
 
   const logoUrl = useMemo(() => {
-    const base64Image = oemResourceConfig?.['logo.png']
-    if (!base64Image) return logoImage
-    if (base64Image.startsWith('data:image/')) return base64Image
-    return `data:image/png;base64,${base64Image}`
+    return oemResourceConfig?.['logo.png']
   }, [oemResourceConfig])
 
   return (

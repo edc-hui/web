@@ -4,7 +4,6 @@ import AutoSizer from 'react-virtualized-auto-sizer'
 import type { DigitalHuman } from '@/apis'
 import ScrollBarContainer from '../ScrollBarContainer'
 import EmployeeCard from './EmployeeCard'
-// import EmployeeCard2 from './EmployeeCard2'
 import { computeColumnCount, gap } from './utils'
 
 interface DigitalHumanListProps {
@@ -43,7 +42,7 @@ const DigitalHumanList: React.FC<DigitalHumanListProps> = ({
 
   return (
     <div className="flex flex-col h-0 flex-1">
-      <ScrollBarContainer className="p-2 pt-0 ml-[-8px] mb-[-8px] mr-[-24px]">
+      <ScrollBarContainer className="p-4 pt-0 -ml-4 -mb-4 -mr-6">
         <AutoSizer style={{ width: 'calc(100% - 8px)' }} disableHeight>
           {({ width }) => {
             const count = computeColumnCount(width)

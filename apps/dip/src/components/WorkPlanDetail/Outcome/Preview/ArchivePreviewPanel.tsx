@@ -18,6 +18,9 @@ export type ArchivePreviewPanelProps = {
   showInlineDownload?: boolean
   /** 内容区外层额外 class */
   className?: string
+  isPreviewFullscreen?: boolean
+  onEnterPreviewFullscreen?: () => void
+  onExitPreviewFullscreen?: () => void
 }
 
 const HTML_PREVIEW_STYLE_TAG = 'data-workplan-html-preview-style'
@@ -90,6 +93,9 @@ const ArchivePreviewPanel = ({
   closable = true,
   showInlineDownload = true,
   className,
+  isPreviewFullscreen = false,
+  onEnterPreviewFullscreen,
+  onExitPreviewFullscreen,
 }: ArchivePreviewPanelProps) => {
   const codeLang = getCodeLangFromTitle(preview.title)
 
@@ -101,6 +107,9 @@ const ArchivePreviewPanel = ({
           onClose={onClose}
           onDownload={onDownload}
           closable={closable}
+          isPreviewFullscreen={isPreviewFullscreen}
+          onEnterPreviewFullscreen={onEnterPreviewFullscreen}
+          onExitPreviewFullscreen={onExitPreviewFullscreen}
         />
       ) : null}
       <ScrollBarContainer

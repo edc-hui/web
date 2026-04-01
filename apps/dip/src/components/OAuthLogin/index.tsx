@@ -3,7 +3,7 @@ import { getIframeSizeApi, TemplateType } from '@/apis'
 import backgroundImage from '@/assets/images/brand/background.png'
 import { useLanguageStore } from '@/stores/languageStore'
 import { useOEMConfigStore } from '@/stores/oemConfigStore'
-// import About from './About'
+import About from './About'
 import Content from './Content'
 import DefaultTemplate from './DefaultTemplate'
 import Footer from './Footer'
@@ -52,19 +52,13 @@ function OAuthLogin() {
       // regular 模式使用 regularBackground.png
       const base64Image = oemResourceConfig?.['regularBackground.png']
       if (base64Image) {
-        if (base64Image.startsWith('data:image/')) {
-          return base64Image
-        }
-        return `data:image/png;base64,${base64Image}`
+        return base64Image
       }
     } else {
       // default 模式使用 defaultBackground.png
       const base64Image = oemResourceConfig?.['defaultBackground.png']
       if (base64Image) {
-        if (base64Image.startsWith('data:image/')) {
-          return base64Image
-        }
-        return `data:image/png;base64,${base64Image}`
+        return base64Image
       }
     }
     return backgroundImage
@@ -81,7 +75,7 @@ function OAuthLogin() {
         header={<Header />}
         content={<Content iframeHeight={iframeHeight} width={420} />}
         footer={<Footer />}
-        // about={<About />}
+        about={<About />}
         background={backgroundImageUrl}
         fontStyle={oemBasicConfig?.regularFont as 'dark' | 'light' | undefined}
         loginBoxLocation={oemBasicConfig?.loginBoxLocation}

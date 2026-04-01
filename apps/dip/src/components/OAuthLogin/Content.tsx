@@ -19,9 +19,9 @@ function Content({ iframeHeight, width = 560 }: ContentProps) {
 
   // 开发环境下直接跳转到登录URL（登录回调会由后端处理并重定向到/login-success）
   useEffect(() => {
-    if (process.env.NODE_ENV === 'development') {
-      window.location.href = loginUrl
-    }
+    // if (process.env.NODE_ENV === 'development') {
+    //   window.location.href = loginUrl
+    // }
   }, [loginUrl])
 
   const widthStyle =

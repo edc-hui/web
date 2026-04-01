@@ -8,7 +8,7 @@ import Empty from '@/components/Empty'
 import IconFont from '@/components/IconFont'
 import ScrollBarContainer from '@/components/ScrollBarContainer'
 import styles from './index.module.less'
-import { ArchivePreviewPanel, useArchivePreview } from './Preview'
+import { ArchivePreviewDrawer, ArchivePreviewPanel, useArchivePreview } from './Preview'
 import {
   mockGetDigitalHumanSessionArchiveSubpath,
   mockGetDigitalHumanSessionArchives,
@@ -28,9 +28,16 @@ export type ResultsPanelProps = {
   planId?: string
   dhId: string
   sessionId: string
+  /** 归档全屏预览抽屉的挂载容器，默认 document.body */
+  previewDrawerGetContainer?: HTMLElement | (() => HTMLElement | null | undefined) | null
 }
 
-const ResultsPanel = ({ planId: _planId, dhId, sessionId }: ResultsPanelProps) => {
+const ResultsPanel = ({
+  planId: _planId,
+  dhId,
+  sessionId,
+  previewDrawerGetContainer,
+}: ResultsPanelProps) => {
   const [rootLoading, setRootLoading] = useState(false)
   const [root, setRoot] = useState<SessionArchivesResponse | null>(null)
   const [rootError, setRootError] = useState(false)
@@ -106,7 +113,24 @@ const ResultsPanel = ({ planId: _planId, dhId, sessionId }: ResultsPanelProps) =
     }
   }, [activeKeys, dhId, sessionId, grouped, folderContents, loadFolder])
 
-  const { preview, openFilePreview, closePreview, downloadFile } = useArchivePreview(dhId, sessionId)
+  const { preview, openFilePreview, closePreview, downloadFile } = useArchivePreview(
+    dhId,
+    sessionId,
+  )
+  const [previewFullscreenOpen, setPreviewFullscreenOpen] = useState(false)
+
+  const resolveDrawerContainer = useCallback((): HTMLElement => {
+    if (!previewDrawerGetContainer) return document.body
+    const node =
+      typeof previewDrawerGetContainer === 'function'
+        ? previewDrawerGetContainer()
+        : previewDrawerGetContainer
+    return node instanceof HTMLElement ? node : document.body
+  }, [previewDrawerGetContainer])
+
+  useEffect(() => {
+    if (preview === null) setPreviewFullscreenOpen(false)
+  }, [preview])
 
   const collapseItems = useMemo(() => {
     return dateKeys.map((dateKey) => {
@@ -247,7 +271,7 @@ const ResultsPanel = ({ planId: _planId, dhId, sessionId }: ResultsPanelProps) =
           </div>
         </ScrollBarContainer>
       </div>
-      {preview !== null ? (
+      {preview !== null && (
         <div className="flex min-h-0 min-w-0 flex-1 flex-col border-l border-[--dip-border-color] bg-[--dip-white]">
           <ArchivePreviewPanel
             preview={preview}
@@ -255,9 +279,24 @@ const ResultsPanel = ({ planId: _planId, dhId, sessionId }: ResultsPanelProps) =
             onClose={closePreview}
             onDownload={() => downloadFile(preview.subpath, preview.title)}
             showInlineDownload={false}
+            onEnterPreviewFullscreen={() => setPreviewFullscreenOpen(true)}
           />
         </div>
-      ) : null}
+      )}
+      {preview !== null && previewFullscreenOpen && (
+        <ArchivePreviewDrawer
+          open={previewFullscreenOpen}
+          preview={preview}
+          getContainer={resolveDrawerContainer}
+          isPreviewFullscreen
+          showInlineDownload={false}
+          onClose={() => {
+            setPreviewFullscreenOpen(false)
+          }}
+          onExitPreviewFullscreen={() => setPreviewFullscreenOpen(false)}
+          onDownload={() => downloadFile(preview.subpath, preview.title)}
+        />
+      )}
     </div>
   )
 }
