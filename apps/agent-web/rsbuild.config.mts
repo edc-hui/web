@@ -44,7 +44,7 @@ export default defineConfig({
         lessOptions: {
           javascriptEnabled: true,
           modifyVars: {
-            '@ant-prefix': packageName, // 自定义前缀，避免与其他项目冲突
+            '@ant-prefix': 'agent-web', // 自定义前缀，避免与其他项目冲突
           },
         },
       },
