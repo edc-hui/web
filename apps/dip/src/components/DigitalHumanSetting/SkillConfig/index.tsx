@@ -19,9 +19,9 @@ const SkillConfig = ({ readonly }: SkillConfigProps) => {
   const [selectSkillModalOpen, setSelectSkillModalOpen] = useState(false)
   const [addSkillDrawerOpen, setAddSkillDrawerOpen] = useState(false)
   const [skillListRefreshToken, setSkillListRefreshToken] = useState(0)
-  const [addSkillDrawerPayload, setAddSkillDrawerPayload] = useState<AiPromptSubmitPayload | null>(
-    null,
-  )
+  const [addSkillDrawerPayload, setAddSkillDrawerPayload] = useState<
+    AiPromptSubmitPayload | undefined
+  >(undefined)
   /** 添加技能 */
   const handleAddSkill = () => {
     setSelectSkillModalOpen(true)
@@ -131,7 +131,7 @@ const SkillConfig = ({ readonly }: SkillConfigProps) => {
         rowKey={(record) => record.name}
         bordered={false}
         size="small"
-        scroll={{ y: 'max(246px, calc(100vh - 326px))' }}
+        scroll={{ y: 'max(246px, calc(100vh - 299px))' }}
         locale={{
           emptyText: (
             <Empty type="empty" title="暂无技能">
@@ -151,7 +151,6 @@ const SkillConfig = ({ readonly }: SkillConfigProps) => {
         refreshToken={skillListRefreshToken}
         onOk={(result) => {
           updateSkills(result || [])
-          setSelectSkillModalOpen(false)
         }}
         onSubmit={(payload) => {
           console.log('payload', payload)
@@ -166,7 +165,7 @@ const SkillConfig = ({ readonly }: SkillConfigProps) => {
         payload={addSkillDrawerPayload ?? undefined}
         onClose={() => {
           setAddSkillDrawerOpen(false)
-          setAddSkillDrawerPayload(null)
+          setAddSkillDrawerPayload(undefined)
           setSkillListRefreshToken((prev) => prev + 1)
         }}
       />

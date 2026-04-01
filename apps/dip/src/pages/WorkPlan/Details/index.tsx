@@ -1,7 +1,7 @@
 import { EllipsisOutlined, ExclamationCircleFilled } from '@ant-design/icons'
 import type { MenuProps } from 'antd'
 import { Dropdown, Modal, message, Tabs } from 'antd'
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useLocation, useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { getDigitalHumanDetail } from '@/apis/dip-studio/digital-human'
 import { type CronJob, getCronJob } from '@/apis/dip-studio/plan'
@@ -37,6 +37,7 @@ const WorkPlanDetail = () => {
   const [modal, modalContextHolder] = Modal.useModal()
   const [messageApi, messageContextHolder] = message.useMessage()
 
+  const workPlanDetailRootRef = useRef<HTMLDivElement>(null)
   const [activeTab, setActiveTab] = useState<WorkPlanDetailTab>('results')
   const [editModalOpen, setEditModalOpen] = useState(false)
   const [digitalHumanName, setDigitalHumanName] = useState('--')
@@ -249,7 +250,10 @@ const WorkPlanDetail = () => {
   )
 
   return (
-    <div className="flex h-full flex-col overflow-hidden bg-[--dip-white]">
+    <div
+      ref={workPlanDetailRootRef}
+      className="relative flex h-full flex-col overflow-hidden bg-[--dip-white]"
+    >
       {modalContextHolder}
       {messageContextHolder}
       <div className="grid h-12 shrink-0 grid-cols-3 items-center gap-2 border-b border-[--dip-border-color] pl-3 pr-6">
@@ -304,7 +308,12 @@ const WorkPlanDetail = () => {
 
       {activeTab === 'results' && (
         <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
-          <Outcome planId={workPlanId} dhId={digitalHumanId} sessionId={sessionKey} />
+          <Outcome
+            planId={workPlanId}
+            dhId={digitalHumanId}
+            sessionId={sessionKey}
+            previewDrawerGetContainer={() => workPlanDetailRootRef.current ?? undefined}
+          />
         </div>
       )}
       {activeTab === 'tasks' && (

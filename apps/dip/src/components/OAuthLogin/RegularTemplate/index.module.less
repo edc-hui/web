@@ -1,17 +1,26 @@
 .container {
   position: absolute;
   inset: 0;
-  overflow: auto;
+  width: 100%;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
   background-position: center center;
   background-repeat: no-repeat;
   background-size: cover;
 
+  .main {
+    flex: 1;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    padding: 40px 80px;
+  }
+
   .index {
     width: 420px;
     overflow: hidden;
-    position: absolute;
-    top: calc((100vh - 510px) * 2 / 5);
-    right: calc((100vw - 420px) * 1 / 18);
+    max-width: 100%;
     border-radius: 12px;
     background: #fff;
     box-shadow: 0 0 16px 4px rgb(0 0 0 / 11%);
@@ -28,8 +37,8 @@
   }
 
   .index-center {
-    right: 50%;
-    transform: translateX(50%);
+    margin-left: auto;
+    margin-right: auto;
   }
 
   .index-transparent {
@@ -43,10 +52,8 @@
   }
 
   .about {
-    position: absolute;
-    bottom: 16px;
-    left: 50%;
-    transform: translateX(-50%);
+    margin: 16px 0;
+    text-align: center;
   }
 
   .font {

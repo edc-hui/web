@@ -99,7 +99,7 @@ const KnowledgeConfig = ({ readonly }: KnowledgeConfigProps) => {
               icon={<IconFont type="icon-add" />}
               onClick={handleSelectKnowledge}
             >
-              选择知识
+              知识
             </Button>
           </div>
         )}
@@ -112,7 +112,7 @@ const KnowledgeConfig = ({ readonly }: KnowledgeConfigProps) => {
         rowKey={(record) => record.url}
         bordered={false}
         size="small"
-        scroll={{ y: 'max(246px, calc(100vh - 326px))' }}
+        scroll={{ y: 'max(246px, calc(100vh - 299px))' }}
         locale={{
           emptyText: (
             <Empty type="empty" title="暂无知识">
@@ -122,7 +122,7 @@ const KnowledgeConfig = ({ readonly }: KnowledgeConfigProps) => {
                   type="primary"
                   onClick={handleSelectKnowledge}
                 >
-                  选择知识
+                  知识
                 </Button>
               )}
             </Empty>

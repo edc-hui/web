@@ -68,7 +68,7 @@
     "@tiptap/suggestion": "^3.16.0",
     "@tiptap/y-tiptap": "^3.0.0",
     "antd": "^6.0.0",
-    "axios": "^1.13.2",
+    "axios": "1.13.6",
     "classnames": "^2.5.1",
     "clsx": "^2.1.1",
     "dayjs": "^1.11.19",

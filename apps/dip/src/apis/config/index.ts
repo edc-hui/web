@@ -1,4 +1,8 @@
-import { get } from '@/utils/http'
+import {
+  defaultIframeSize,
+  defaultOemBasicConfig,
+  defaultOemResourceConfigs,
+} from './defaultConfig'
 import type { AppConfigResponse, OemBasicConfig, OemResourceConfig } from './index.d'
 import {
   FontStyle,
@@ -33,65 +37,45 @@ export function postLanguageApi(_language: string): Promise<void> {
 }
 
 /**
- * 将语言代码转换为 section 参数
+ * 获取 OEM 资源配置（使用本地默认配置）
  * @param language 语言代码，如 'zh-CN', 'zh-TW', 'en-US'
- * @returns section 参数，如 'shareweb_zh-cn', 'shareweb_zh-tw', 'shareweb_en-us'
- */
-function getSectionByLanguage(language: string): string {
-  const langMap: Record<string, string> = {
-    'zh-CN': 'shareweb_zh-cn',
-    'zh-TW': 'shareweb_zh-tw',
-    'zh-HK': 'shareweb_zh-tw',
-    'en-US': 'shareweb_en-us',
-    en: 'shareweb_en-us',
-  }
-
-  // 优先精确匹配
-  if (langMap[language]) {
-    return langMap[language]
-  }
-
-  // 尝试匹配前缀
-  const langPrefix = language.split('-')[0].toLowerCase()
-  if (langPrefix === 'zh') {
-    return 'shareweb_zh-cn' // 默认简体中文
-  }
-  if (langPrefix === 'en') {
-    return 'shareweb_en-us'
-  }
-
-  // 默认返回简体中文
-  return 'shareweb_zh-cn'
-}
-
-/**
- * 获取 OEM 资源配置
- * @param language 语言代码，如 'zh-CN', 'zh-TW', 'en-US'
- * @param product product 参数，默认为 'dip'
+ * @param _product product 参数，占位保持原有签名
  */
 export function getOEMResourceConfigApi(
   language: string = 'zh-CN',
-  product: string = 'dip',
+  _product: string = 'dip',
 ): Promise<OemResourceConfig> {
-  const section = getSectionByLanguage(language)
-  return get('/api/deploy-web-service/v1/oemconfig', {
-    params: { section, product },
-  })
+  // 先按语言精确匹配
+  const directConfig = defaultOemResourceConfigs[language]
+  if (directConfig) {
+    return Promise.resolve(directConfig)
+  }
+
+  // 再根据语言前缀做兜底
+  const langPrefix = language.split('-')[0].toLowerCase()
+  if (langPrefix === 'zh') {
+    return Promise.resolve(defaultOemResourceConfigs['zh-CN'] || defaultOemResourceConfigs['zh-TW'])
+  }
+  if (langPrefix === 'en') {
+    return Promise.resolve(defaultOemResourceConfigs['en-US'])
+  }
+
+  // 最终兜底：返回第一个可用配置
+  const firstConfig = Object.values(defaultOemResourceConfigs)[0]
+  return Promise.resolve(firstConfig)
 }
 
 /**
- * 获取 OEM 基本配置
+ * 获取 OEM 基本配置（使用本地默认配置）
  */
 export function getOEMBasicConfigApi(): Promise<OemBasicConfig> {
-  return get('/api/deploy-web-service/v1/oemconfig', {
-    params: { section: 'anyshare', product: 'dip' },
-  })
+  return Promise.resolve(defaultOemBasicConfig)
 }
 
 /**
- * 获取 iframe 高度
+ * 获取 iframe 高度（使用本地默认配置）
  * @returns iframe 高度（像素）
  */
 export function getIframeSizeApi(): Promise<{ height: number }> {
-  return get('/oauth2/iframe-size')
+  return Promise.resolve(defaultIframeSize)
 }

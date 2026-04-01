@@ -1,6 +1,7 @@
 import classNames from 'classnames'
 import type { ReactNode } from 'react'
 import type { LoginBoxLocationType, LoginBoxStyleType } from '@/apis'
+import ScrollBarContainer from '@/components/ScrollBarContainer'
 import Content from '../Content'
 import Footer from '../Footer'
 import Header from '../Header'
@@ -32,28 +33,30 @@ const RegularTemplate = ({
   iframeHeight = 410,
 }: RegularTemplateProps) => {
   return (
-    <div
+    <ScrollBarContainer
       className={classNames(styles.container, className)}
       style={{ backgroundImage: background ? `url(${background})` : undefined }}
     >
-      <div
-        className={classNames(
-          styles.index,
-          loginBoxLocation === 'center' ? styles['index-center'] : '',
-          loginBoxStyle === 'transparent' ? styles['index-transparent'] : '',
-        )}
-      >
-        <div className={styles['header-bar']}>{header}</div>
-        <div className={styles.login}>
-          {content || <Content iframeHeight={iframeHeight} width={420} />}
+      <div className={styles.main}>
+        <div
+          className={classNames(
+            styles.index,
+            loginBoxLocation === 'center' ? styles['index-center'] : '',
+            loginBoxStyle === 'transparent' ? styles['index-transparent'] : '',
+          )}
+        >
+          <div className={styles['header-bar']}>{header}</div>
+          <div className={styles.login}>
+            {content || <Content iframeHeight={iframeHeight} width={420} />}
+          </div>
+          <div className={styles.footer}>{footer}</div>
         </div>
-        <div className={styles.footer}>{footer}</div>
+        <div className={fontStyle === 'light' ? styles.mask : ''} />
       </div>
-      <div className={fontStyle === 'light' ? styles.mask : ''} />
       <div className={classNames(styles.about, fontStyle === 'light' ? styles.font : '')}>
         {about}
       </div>
-    </div>
+    </ScrollBarContainer>
   )
 }
 

@@ -10,7 +10,7 @@ import {
   FileZipOutlined,
   VideoCameraOutlined,
 } from '@ant-design/icons'
-import { Drawer, Spin } from 'antd'
+import { Spin } from 'antd'
 import { memo, useEffect, useState } from 'react'
 import {
   getSessionArchiveSubpath,
@@ -19,7 +19,7 @@ import {
   type SessionArchivesResponse,
 } from '@/apis/dip-studio/sessions'
 import Empty from '@/components/Empty'
-import { ArchivePreviewPanel, useArchivePreview } from '@/components/WorkPlanDetail/Outcome/Preview'
+import { ArchivePreviewDrawer, useArchivePreview } from '@/components/WorkPlanDetail/Outcome/Preview'
 import {
   mockGetDigitalHumanSessionArchiveSubpath,
   mockGetDigitalHumanSessionArchives,
@@ -225,36 +225,19 @@ function TaskOutcomeListInner({ digitalHumanId, sessionId }: TaskOutcomeListProp
         })}
       </ul>
 
-      <Drawer
+      <ArchivePreviewDrawer
         open={drawerOpen}
+        preview={preview}
+        size="60%"
         onClose={() => {
           setDrawerOpen(false)
           closePreview()
         }}
-        size="60%"
-        closable={false}
-        mask={{ closable: true }}
-        destroyOnHidden
-        styles={{ body: { padding: 0, overflow: 'hidden' } }}
-      >
-        <div className="flex h-full min-h-0 flex-col overflow-hidden">
-          {preview ? (
-            <ArchivePreviewPanel
-              preview={preview}
-              showHeader
-              onDownload={() => downloadFile(preview.subpath, preview.title)}
-              onClose={() => {
-                setDrawerOpen(false)
-                closePreview()
-              }}
-            />
-          ) : (
-            <div className="flex h-full items-center justify-center p-6">
-              <Empty title="暂无预览内容" />
-            </div>
-          )}
-        </div>
-      </Drawer>
+        onDownload={() => {
+          if (!preview) return
+          return downloadFile(preview.subpath, preview.title)
+        }}
+      />
     </>
   )
 }
