@@ -251,13 +251,13 @@ const ResultsPanel = ({
   return (
     <div className="flex min-h-0 flex-1 overflow-hidden">
       <div className="flex min-h-0 min-w-0 flex-1 flex-col">
-        <ScrollBarContainer className="flex min-h-0 flex-col px-6 py-5">
+        <div className="flex min-h-0 flex-col px-6 py-5">
           <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-lg border border-[--dip-border-color] bg-[--dip-white]">
             <div className="flex h-10 shrink-0 items-center justify-between gap-4 border-b border-[--dip-border-color] bg-[#F5F5F4] px-6 text-[--dip-text-color-65]">
               <span>文件名称</span>
               <span className="w-36">更新时间</span>
             </div>
-            <div className="min-h-0 min-w-0 flex-1 overflow-auto">
+            <ScrollBarContainer className="min-h-0 min-w-0 flex-1 overflow-auto">
               <Collapse
                 activeKey={activeKeys}
                 bordered={false}
@@ -267,9 +267,9 @@ const ResultsPanel = ({
                   setActiveKeys(Array.isArray(keys) ? keys : [keys])
                 }}
               />
-            </div>
+            </ScrollBarContainer>
           </div>
-        </ScrollBarContainer>
+        </div>
       </div>
       {preview !== null && (
         <div className="flex min-h-0 min-w-0 flex-1 flex-col border-l border-[--dip-border-color] bg-[--dip-white]">

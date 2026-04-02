@@ -1,6 +1,6 @@
-import { PushpinOutlined } from '@ant-design/icons'
 import { type MenuProps, Popover } from 'antd'
 import type { ApplicationInfo } from '@/apis'
+import PinIcon from '@/assets/icons/icon_pin.svg?react'
 import { usePreferenceStore } from '@/stores'
 import { MyAppActionEnum } from './types'
 
@@ -17,7 +17,7 @@ export const getMyAppMenuItems = (
       {
         key: 'unfix',
         label: '取消固定',
-        icon: <PushpinOutlined className="text-[var(--dip-warning-color)]" />,
+        icon: <PinIcon className="text-[var(--dip-warning-color)] w-4 h-4" />,
         onClick: () => onMenuClick(MyAppActionEnum.Unfix),
       },
     ]
@@ -25,7 +25,7 @@ export const getMyAppMenuItems = (
   return [
     {
       key: 'fix',
-      icon: <PushpinOutlined />,
+      icon: <PinIcon className="w-4 h-4" />,
       label: '固定',
       onClick: () => onMenuClick(MyAppActionEnum.Fix),
     },
@@ -41,8 +41,8 @@ export const getMyAppMoreBtn = (
   if (pinned) {
     return (
       <Popover content="取消固定">
-        <PushpinOutlined
-          className="w-6 h-6 flex items-center justify-center rounded hover:bg-[--dip-hover-bg-color] text-[var(--dip-warning-color)]"
+        <PinIcon
+          className="w-4 h-4 flex items-center justify-center rounded hover:bg-[--dip-hover-bg-color] text-[var(--dip-warning-color)]"
           onClick={() => onMenuClick(MyAppActionEnum.Unfix)}
         />
       </Popover>
@@ -50,8 +50,8 @@ export const getMyAppMoreBtn = (
   }
   return (
     <Popover content="固定">
-      <PushpinOutlined
-        className="w-6 h-6 flex items-center justify-center rounded text-[var(--dip-text-color-45)] hover:bg-[--dip-hover-bg-color]"
+      <PinIcon
+        className="w-4 h-4 flex items-center justify-center rounded text-[var(--dip-text-color-45)] hover:bg-[--dip-hover-bg-color]"
         onClick={() => onMenuClick(MyAppActionEnum.Fix)}
       />
     </Popover>

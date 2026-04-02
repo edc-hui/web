@@ -1,9 +1,7 @@
 /**
  * 数字员工（Digital Human）API 类型
- * 与 digital-human.paths.yaml / digital-human.schemas.yaml 保持一致
+ * 与 digital-human.paths / digital-human.schemas 保持一致
  */
-
-import type { DigitalHumanSkill } from '../skills'
 
 /** 知识源条目（BknEntry） */
 export interface BknEntry {
@@ -43,7 +41,18 @@ export interface DigitalHuman {
   icon_id?: string
 }
 
-export type DigitalHumanList = DigitalHuman[]
+export type DigitalHumanList = DigitalHumanDetail[]
+
+/** 预置数字员工模板 */
+export interface BuiltInDigitalHuman {
+  id: string
+  name: string
+  description?: string
+  /** 头像：可为 data URL、预置 dh_1…dh_8、或裸 base64 */
+  icon_id?: string
+}
+
+export type BuiltInDigitalHumanList = BuiltInDigitalHuman[]
 
 /** 创建/更新请求体：技能为目录名列表（string[]） */
 type DigitalHumanWriteBody = {
@@ -53,22 +62,22 @@ type DigitalHumanWriteBody = {
   channel?: ChannelConfig
 }
 
-/** 详情与创建/更新响应中的扩展字段（技能为 DigitalHumanSkill[]） */
+/** 详情与创建/更新响应中的扩展字段（技能为 string[]） */
 type DigitalHumanEntityOptional = {
   creature?: string
   soul?: string
-  skills?: DigitalHumanSkill[]
+  skills?: string[]
   bkn?: BknEntry[]
   channel?: ChannelConfig
 }
 
 /**
  * 数字员工详情（DigitalHumanDetail）
- * `skills` 为带名称与描述的结构列表；请求创建/更新时 `skills` 使用 `string[]`（见 CreateDigitalHumanRequest）。
+ * `skills` 为当前绑定的技能 id 列表（string[]）。
  */
 export type DigitalHumanDetail = DigitalHuman & {
   soul: string
-  skills?: DigitalHumanSkill[]
+  skills?: string[]
   bkn?: BknEntry[]
   channel?: ChannelConfig
 }

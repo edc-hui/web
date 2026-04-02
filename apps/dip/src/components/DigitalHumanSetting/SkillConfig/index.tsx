@@ -5,6 +5,7 @@ import type { AiPromptSubmitPayload } from '@/components/DipChatKit/components/A
 import Empty from '@/components/Empty'
 import IconFont from '@/components/IconFont'
 import ScrollBarContainer from '@/components/ScrollBarContainer'
+import { DEFAULT_SKILL_ICON_COLORS, getMatchedColorByName } from '@/utils/colorUtils'
 import { useDigitalHumanStore } from '../digitalHumanStore'
 import AddSkillDrawer from './AddSkillDrawer.tsx'
 import styles from './index.module.less'
@@ -31,7 +32,6 @@ const SkillConfig = ({ readonly }: SkillConfigProps) => {
   const handleMenuItemClick = (key: 'edit' | 'delete', record: DigitalHumanSkill) => {
     switch (key) {
       case 'edit':
-        console.log('edit', record)
         break
 
       case 'delete':
@@ -50,16 +50,23 @@ const SkillConfig = ({ readonly }: SkillConfigProps) => {
         title: '技能名称',
         dataIndex: 'name',
         key: 'name',
-        width: '40%',
-        render: (text: string) => {
+        width: '28%',
+        render: (text: string, record: DigitalHumanSkill) => {
           return (
-            <div className="flex items-center truncate">
-              <IconFont
-                type="icon-deep-thinking"
-                className="text-[--dip-primary-color] text-base h-6 w-6 shrink-0"
-              />
+            <div className="flex items-center truncate gap-x-2">
+              <div
+                className="flex h-8 w-8 pl-1 pb-0.5 shrink-0 items-end rounded text-[8px] font-semibold leading-tight text-white"
+                style={{
+                  backgroundColor: getMatchedColorByName(text, DEFAULT_SKILL_ICON_COLORS),
+                }}
+              >
+                skill
+              </div>
               <span title={text} className="truncate">
                 {text || '--'}
+              </span>
+              <span className="text-xs text-[#A0A0A9] font-normal flex-shrink-0">
+                @{record.built_in ? '内置' : record.type === 'openclaw-managed' ? '自定义' : '官方'}
               </span>
             </div>
           )
@@ -78,24 +85,15 @@ const SkillConfig = ({ readonly }: SkillConfigProps) => {
         width: 80,
         render: (_: unknown, record: DigitalHumanSkill) => (
           <Flex align="center">
-            {/* <Tooltip title="编辑">
-              <Button
-                type="text"
-                onClick={(e) => {
-                  e.stopPropagation()
-                  handleMenuItemClick('edit', record)
-                }}
-                icon={<IconFont type="icon-settings" />}
-              />
-            </Tooltip> */}
             <Tooltip title="删除">
               <Button
                 type="text"
+                disabled={record.built_in}
                 onClick={(e) => {
                   e.stopPropagation()
                   handleMenuItemClick('delete', record)
                 }}
-                icon={<IconFont type="icon-trash" />}
+                icon={<IconFont type="icon-remove" />}
               />
             </Tooltip>
           </Flex>
@@ -116,7 +114,6 @@ const SkillConfig = ({ readonly }: SkillConfigProps) => {
         </div>
         {skills.length > 0 && !readonly && (
           <div className="flex items-end gap-x-3">
-            {/* <SearchInput onSearch={handleSearch} placeholder="搜索技能" variant="outlined" /> */}
             <Button type="primary" icon={<IconFont type="icon-add" />} onClick={handleAddSkill}>
               技能
             </Button>
@@ -146,16 +143,15 @@ const SkillConfig = ({ readonly }: SkillConfigProps) => {
       />
       <SelectSkillModal
         open={selectSkillModalOpen}
-        showMask={!addSkillDrawerOpen}
         digitalHumanId={digitalHumanId}
         refreshToken={skillListRefreshToken}
         onOk={(result) => {
           updateSkills(result || [])
         }}
         onSubmit={(payload) => {
-          console.log('payload', payload)
           setAddSkillDrawerPayload(payload)
           setAddSkillDrawerOpen(true)
+          setSelectSkillModalOpen(false)
         }}
         onCancel={() => setSelectSkillModalOpen(false)}
         defaultSelectedSkills={skills}
@@ -167,6 +163,7 @@ const SkillConfig = ({ readonly }: SkillConfigProps) => {
           setAddSkillDrawerOpen(false)
           setAddSkillDrawerPayload(undefined)
           setSkillListRefreshToken((prev) => prev + 1)
+          setSelectSkillModalOpen(true)
         }}
       />
     </ScrollBarContainer>

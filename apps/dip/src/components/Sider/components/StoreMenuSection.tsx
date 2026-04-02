@@ -1,7 +1,8 @@
 import type { MenuProps } from 'antd'
-import { Menu } from 'antd'
+import { Menu, Popover } from 'antd'
 import { useEffect, useMemo, useState } from 'react'
 import type { NavigateFunction } from 'react-router-dom'
+import PinIcon from '@/assets/icons/icon_pin.svg?react'
 import aiStoreUrl from '@/assets/images/sider/aiStore.svg'
 import AppIcon from '@/components/AppIcon'
 import { routeConfigs } from '@/routes/routes'
@@ -25,8 +26,7 @@ export const StoreMenuSection = ({
   navigate,
   roleIds = new Set<string>(),
 }: StoreMenuSectionProps) => {
-  const { pinnedMicroApps, wenshuAppInfo } = usePreferenceStore()
-
+  const { pinnedMicroApps, wenshuAppInfo, unpinMicroApp } = usePreferenceStore()
   const [openKeys, setOpenKeys] = useState<string[]>([AI_STORE_SUBMENU_KEY])
   const isAiStoreOpen = openKeys.includes(AI_STORE_SUBMENU_KEY)
 
@@ -94,7 +94,22 @@ export const StoreMenuSection = ({
       .forEach((app) => {
         children.push({
           key: `micro-app-${app.key}`,
-          label: app.name,
+          label: (
+            <div className="w-full h-full flex justify-between items-center">
+              <span className="truncate">{app.name}</span>
+              <Popover content="取消固定">
+                <div className="w-6 h-6 ml-2 items-center justify-center rounded hidden flex-shrink-0 rounded text-[var(--dip-warning-color)] pin-icon hover:bg-[rgba(0,0,0,0.04)]">
+                  <PinIcon
+                    className="w-4 h-4"
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      void unpinMicroApp(app.key)
+                    }}
+                  />
+                </div>
+              </Popover>
+            </div>
+          ),
           icon: <AppIcon icon={app.icon} name={app.name} size={16} shape="square" />,
           onClick: () => {
             navigate(`/application/${encodeURIComponent(app.key)}`)

@@ -42,11 +42,11 @@ const DefaultIndexRedirect = () => {
           const guideStatus = await getGuideStatus()
           hasNavigatedRef.current = true
           if (guideStatus.ready) {
-            navigate('/digital-human/management', { replace: true })
+            navigate('/studio/digital-human', { replace: true })
             return
           }
 
-          navigate('/initial-configuration', {
+          navigate('/studio/initial-configuration', {
             replace: true,
             state: { guideStatus, breadcrumbMode: 'init-only' },
           })
@@ -68,7 +68,7 @@ const DefaultIndexRedirect = () => {
           navigate(targetPath, { replace: true })
           return
         }
-        navigate(isAdmin ? '/digital-human/management' : '/home', { replace: true })
+        navigate(isAdmin ? '/studio/digital-human' : '/home', { replace: true })
       }
     })()
   }, [navigate, isAdmin, modules])

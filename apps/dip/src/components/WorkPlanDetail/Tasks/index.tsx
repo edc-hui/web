@@ -91,7 +91,6 @@ function TasksPanelInner({
         }
       } catch (error: any) {
         if (!cancelled) {
-          console.log('error', error)
           if (error.code === 'NOT_FOUND') {
             setPlanPreview({
               ...basePreview,
@@ -126,19 +125,19 @@ function TasksPanelInner({
   return (
     <PreviewDrawerContainerContext.Provider value={previewDrawerGetContainer ?? undefined}>
       <div className="flex min-h-0 flex-1 flex-row overflow-hidden">
-      <div className="flex min-h-0 min-w-0 flex-1 flex-col border-r border-[--dip-border-color] bg-[#FAFAF9]">
-        <ScrollBarContainer className="flex min-h-0 flex-1 flex-col">
-          <div className="flex shrink-0 flex-col gap-4 px-5">
-            {!bannerDismissed ? (
-              <div className="flex items-start gap-2 mt-4 rounded-lg border border-[#d9f7be] px-3 py-[9px] bg-[--dip-white]">
-                <CheckCircleFilled
-                  className="mt-0.5 shrink-0 text-base text-[#52c41a]"
-                  aria-hidden
-                />
-                <p className="m-0 min-w-0 flex-1 text-sm leading-[1.57] text-[--dip-text-color]">
-                  这里是我们一起对齐的计划文档，我已经根据我们最近的对话完成了最新校准，您可到【指令】页面随时调整。
-                </p>
-                {/* <button
+        <div className="flex min-h-0 min-w-0 flex-1 flex-col border-r border-[--dip-border-color] bg-[#FAFAF9]">
+          <ScrollBarContainer className="flex min-h-0 flex-1 flex-col">
+            <div className="flex shrink-0 flex-col gap-4 px-5">
+              {!bannerDismissed ? (
+                <div className="flex items-start gap-2 mt-4 rounded-lg border border-[#d9f7be] px-3 py-[9px] bg-[--dip-white]">
+                  <CheckCircleFilled
+                    className="mt-0.5 shrink-0 text-base text-[#52c41a]"
+                    aria-hidden
+                  />
+                  <p className="m-0 min-w-0 flex-1 text-sm leading-[1.57] text-[--dip-text-color]">
+                    这里是我们一起对齐的计划文档，我已经根据我们最近的对话完成了最新校准，您可到【指令】页面随时调整。
+                  </p>
+                  {/* <button
                   type="button"
                   className="flex h-[22px] w-[22px] shrink-0 cursor-pointer items-center justify-center rounded border-0 bg-transparent p-0 text-[--dip-text-color-45] transition-colors hover:bg-[--dip-hover-bg-color] hover:text-[--dip-text-color]"
                   aria-label="关闭提示"
@@ -146,70 +145,70 @@ function TasksPanelInner({
                 >
                   <IconFont type="icon-close" />
                 </button> */}
-              </div>
-            ) : null}
-          </div>
-          <div className="flex min-h-0 min-w-0 flex-1 flex-col pl-1">
-            <div className="flex min-h-0 min-w-0 flex-1 flex-col border-l-0">
-              <ArchivePreviewPanel preview={planPreview} />
+                </div>
+              ) : null}
             </div>
-          </div>
-        </ScrollBarContainer>
-      </div>
-
-      <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden bg-[--dip-white]">
-        <ScrollBarContainer
-          onScroll={handleListScroll}
-          className="flex min-h-0 flex-1 flex-col px-6 py-4 relative"
-          style={{ overscrollBehavior: 'contain' }}
-        >
-          <div className="mx-auto flex h-full w-full max-w-[720px] flex-col gap-5 pb-2">
-            {initialLoading ? (
-              <div className="inset-0 flex h-full w-full items-center justify-center py-20">
-                <Spin />
+            <div className="flex min-h-0 min-w-0 flex-1 flex-col pl-1">
+              <div className="flex min-h-0 min-w-0 flex-1 flex-col border-l-0">
+                <ArchivePreviewPanel preview={planPreview} />
               </div>
-            ) : loadError && entries.length === 0 ? (
-              <div className="inset-0 flex items-center justify-center py-12">
-                <Empty type="failed" title="加载失败" />
-              </div>
-            ) : (
-              <>
-                <h2 className="m-0 text-base font-bold leading-normal text-[--dip-text-color]">
-                  执行记录 · {total}
-                </h2>
+            </div>
+          </ScrollBarContainer>
+        </div>
 
-                {entries.length === 0 ? (
-                  <div className="inset-0 flex justify-center py-12">
-                    <Empty title="暂无数据" />
-                  </div>
-                ) : (
-                  <div className="flex flex-col gap-2 pb-2">
-                    {entries.map((entry, i) => {
-                      const rowKey = `${entry.jobId}-${entry.ts}-${i}`
-                      return (
-                        <TaskRunRow
-                          key={rowKey}
-                          entry={entry}
-                          digitalHumanId={dhId}
-                          expanded={expandedKey === rowKey}
-                          onToggle={() =>
-                            setExpandedKey((prev) => (prev === rowKey ? null : rowKey))
-                          }
-                        />
-                      )
-                    })}
-                  </div>
-                )}
-              </>
-            )}
-          </div>
-        </ScrollBarContainer>
-        {loadingMore ? (
-          <div className="flex shrink-0 justify-center px-6 py-2">
-            <Spin size="small" />
-          </div>
-        ) : null}
-      </div>
+        <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden bg-[--dip-white]">
+          <ScrollBarContainer
+            onScroll={handleListScroll}
+            className="flex min-h-0 flex-1 flex-col px-6 py-4 relative"
+            style={{ overscrollBehavior: 'contain' }}
+          >
+            <div className="mx-auto flex h-full w-full max-w-[720px] flex-col gap-5 pb-2">
+              {initialLoading ? (
+                <div className="inset-0 flex h-full w-full items-center justify-center py-20">
+                  <Spin />
+                </div>
+              ) : loadError && entries.length === 0 ? (
+                <div className="inset-0 flex items-center justify-center py-12">
+                  <Empty type="failed" title="加载失败" />
+                </div>
+              ) : (
+                <>
+                  <h2 className="m-0 text-base font-bold leading-normal text-[--dip-text-color]">
+                    执行记录 · {total}
+                  </h2>
+
+                  {entries.length === 0 ? (
+                    <div className="inset-0 flex justify-center py-12">
+                      <Empty title="暂无数据" />
+                    </div>
+                  ) : (
+                    <div className="flex flex-col gap-2 pb-2">
+                      {entries.map((entry, i) => {
+                        const rowKey = `${entry.jobId}-${entry.ts}-${i}`
+                        return (
+                          <TaskRunRow
+                            key={rowKey}
+                            entry={entry}
+                            digitalHumanId={dhId}
+                            expanded={expandedKey === rowKey}
+                            onToggle={() =>
+                              setExpandedKey((prev) => (prev === rowKey ? null : rowKey))
+                            }
+                          />
+                        )
+                      })}
+                    </div>
+                  )}
+                </>
+              )}
+            </div>
+          </ScrollBarContainer>
+          {loadingMore ? (
+            <div className="flex shrink-0 justify-center px-6 py-2">
+              <Spin size="small" />
+            </div>
+          ) : null}
+        </div>
       </div>
     </PreviewDrawerContainerContext.Provider>
   )

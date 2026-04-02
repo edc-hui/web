@@ -107,7 +107,7 @@ const WorkPlanDetail = () => {
             {
               key: 'breadcrumb-digital-human-mgmt',
               name: '我的数字员工',
-              path: '/digital-human/management',
+              path: '/studio/digital-human',
             },
             {
               key: 'breadcrumb-digital-human-name',
@@ -152,7 +152,7 @@ const WorkPlanDetail = () => {
       navigate(from)
       return
     }
-    navigate('/work-plan')
+    navigate('/studio/work-plan')
   }, [from, navigate])
 
   const handleDeletePlan = useCallback(() => {

@@ -106,10 +106,7 @@ export function useDigitalHumanPageLoad(
           getDigitalHumanSkills(digitalHumanId),
         ])
         if (cancelled) return
-        bindDigitalHuman({
-          ...detail,
-          skills: agentSkills,
-        })
+        bindDigitalHuman(detail, agentSkills)
       } catch (err: unknown) {
         if (cancelled) return
         const desc =

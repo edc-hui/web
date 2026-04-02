@@ -75,7 +75,7 @@ const HomeSider = ({ collapsed, onCollapse, layout = 'entry' }: HomeSiderProps) 
   const handleOpenPlanDetail = useCallback(
     (planId: string, _agentId: string, sessionId: string) => {
       navigate({
-        pathname: `/work-plan/${planId}`,
+        pathname: `/studio/work-plan/${planId}`,
         search: `?${createSearchParams({
           sessionKey: sessionId,
         })}`,
@@ -113,12 +113,12 @@ const HomeSider = ({ collapsed, onCollapse, layout = 'entry' }: HomeSiderProps) 
   }, [fetchSessions, hasStudio])
 
   useEffect(() => {
-    const match = location.pathname.match(/^\/history\/([^/]+)$/)
+    const match = location.pathname.match(/^\/studio\/history\/([^/]+)$/)
     setSelectedSessionKey(match ? decodeURIComponent(match[1]) : undefined)
   }, [location.pathname, setSelectedSessionKey])
 
   useEffect(() => {
-    const match = location.pathname.match(/^\/work-plan\/([^/]+)$/)
+    const match = location.pathname.match(/^\/studio\/work-plan\/([^/]+)$/)
     setSelectedPlanId(match ? decodeURIComponent(match[1]) : undefined)
   }, [location.pathname, setSelectedPlanId])
 
@@ -199,7 +199,7 @@ const HomeSider = ({ collapsed, onCollapse, layout = 'entry' }: HomeSiderProps) 
               selectedKey={selectedKey}
               roleIds={roleIds}
               navigate={navigate}
-              allowedKeys={['digital-human-management']}
+              allowedKeys={['digital-human']}
             />
 
             {!collapsed && topPlans.length > 0 ? (
@@ -208,7 +208,7 @@ const HomeSider = ({ collapsed, onCollapse, layout = 'entry' }: HomeSiderProps) 
                 hasMore={hasPlanMore}
                 total={plans.length}
                 selectedPlanId={selectedPlanId}
-                onMore={() => navigate('/work-plan')}
+                onMore={() => navigate('/studio/work-plan')}
                 onOpenPlanDetail={(planId, agentId, sessionId) => {
                   setSelectedPlanId(planId)
                   handleOpenPlanDetail(planId, agentId, sessionId)
@@ -225,10 +225,10 @@ const HomeSider = ({ collapsed, onCollapse, layout = 'entry' }: HomeSiderProps) 
                 hasMore={hasHistoryMore}
                 total={historySessions.length}
                 selectedSessionKey={selectedSessionKey}
-                onMore={() => navigate('/history')}
+                onMore={() => navigate('/studio/history')}
                 onOpenHistoryDetail={(sessionKey) => {
                   setSelectedSessionKey(sessionKey)
-                  navigate(`/history/${sessionKey}`)
+                  navigate(`/studio/history/${sessionKey}`)
                 }}
                 onDeleteHistory={(session) => {
                   modal.confirm({

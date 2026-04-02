@@ -50,3 +50,33 @@ export interface UninstallSkillResult {
   /** 已卸载的技能 ID */
   name: string
 }
+
+/** 技能目录树节点（递归，`type` 为 `directory` 时可有 `children`） */
+export interface SkillTreeEntry {
+  name: string
+  /** 相对技能根目录的路径，使用 `/` 分隔 */
+  path: string
+  type: 'file' | 'directory'
+  children?: SkillTreeEntry[]
+}
+
+/** 获取技能目录树响应（`GET /skills/{name}/tree`） */
+export interface SkillTreeResponse {
+  /** 技能 ID */
+  name: string
+  entries: SkillTreeEntry[]
+}
+
+/** 预览技能文件内容响应（`GET /skills/{name}/content`） */
+export interface SkillFileContentResponse {
+  /** 技能 ID */
+  name: string
+  /** 相对技能根目录的文件路径 */
+  path: string
+  /** UTF-8 文本内容（可能因 1MB 限制被截断） */
+  content: string
+  /** 文件实际大小（字节） */
+  bytes: number
+  /** 是否因超过服务端预览上限而被截断 */
+  truncated: boolean
+}

@@ -17,12 +17,7 @@ const WorkPlan = () => {
       <div className="flex justify-between items-center mt-6 mb-4 flex-shrink-0 z-20 max-w-[880px] w-full mx-auto">
         <span className="font-bold text-lg text-[--dip-text-color]">全部</span>
         <div className="flex-shrink-0">
-          <SearchInput
-            variant="outlined"
-            className="!rounded"
-            placeholder="搜索工作计划"
-            onSearch={handleSearch}
-          />
+          <SearchInput placeholder="搜索工作计划" onSearch={handleSearch} />
         </div>
       </div>
       <PlanList
@@ -32,7 +27,7 @@ const WorkPlan = () => {
           const from = `${location.pathname}${location.search}`
           navigate(
             {
-              pathname: `/work-plan/${job.id}`,
+              pathname: `/studio/work-plan/${job.id}`,
               search: `?${createSearchParams({
                 sessionKey: job.sessionKey,
               })}`,

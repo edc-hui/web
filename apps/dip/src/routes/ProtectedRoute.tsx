@@ -15,7 +15,7 @@ interface ProtectedRouteProps {
  */
 export const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
   // 订阅 store 状态，用于触发重新渲染
-  const { fetchUserInfo, userInfo, isLoading } = useUserInfoStore()
+  const { fetchUserInfo, userInfo, isLoading, modules } = useUserInfoStore()
   const { fetchPinnedMicroApps } = usePreferenceStore()
   const location = useLocation()
   const navigate = useNavigate()
@@ -27,7 +27,7 @@ export const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
 
   // 通过环境变量控制是否跳过登录认证
   // 在 .env.local 中设置 PUBLIC_SKIP_AUTH=true 即可跳过登录认证
-  const skipAuth = import.meta.env.PUBLIC_SKIP_AUTH === 'true'
+  const skipAuth = false
 
   // 0) 支持外部平台通过 URL 携带 token和 refreshToken 免登录
   useEffect(() => {
@@ -134,14 +134,8 @@ export const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
   // 增加 focus 监听，确保在多标签页场景下（如在 AI Store 标签页操作后回到首页）能及时同步状态
   useEffect(() => {
     const refresh = () => {
-      if (!skipAuth && token && userInfo) {
-        const pathname = location.pathname
-        const inMicroAppModule = pathname.startsWith('/application/')
-        const inAiStoreModule = pathname.startsWith('/store/')
-
-        if (inMicroAppModule || inAiStoreModule) {
-          fetchPinnedMicroApps()
-        }
+      if (!skipAuth && token && userInfo && modules.includes('store')) {
+        fetchPinnedMicroApps()
       }
     }
 
@@ -153,7 +147,7 @@ export const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
     return () => {
       window.removeEventListener('focus', refresh)
     }
-  }, [skipAuth, token, userInfo, fetchPinnedMicroApps, location.pathname])
+  }, [skipAuth, token, userInfo, fetchPinnedMicroApps, location.pathname, modules])
 
   // 如果跳过认证，直接返回子组件
   if (skipAuth) {

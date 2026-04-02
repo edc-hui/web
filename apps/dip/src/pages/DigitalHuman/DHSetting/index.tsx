@@ -13,22 +13,15 @@ import DeleteModal from '@/components/DigitalHumanSetting/ActionModal/DeleteModa
 import { useDigitalHumanStore } from '@/components/DigitalHumanSetting/digitalHumanStore'
 import IconFont from '@/components/IconFont'
 import { useUserInfoStore } from '@/stores/userInfoStore'
+import { resolveDigitalHumanIconSrc } from '@/utils/digital-human/resolveDigitalHumanIcon'
 import { formatTimeSlash } from '@/utils/handle-function/FormatTime'
 import { useDigitalHumanPageLoad } from '../useDigitalHumanPageLoad'
-import dh1 from '@/assets/icons/avator/dh_1.svg'
-import dh2 from '@/assets/icons/avator/dh_2.svg'
-import dh3 from '@/assets/icons/avator/dh_3.svg'
-import dh4 from '@/assets/icons/avator/dh_4.svg'
-import dh5 from '@/assets/icons/avator/dh_5.svg'
-import dh6 from '@/assets/icons/avator/dh_6.svg'
-import dh7 from '@/assets/icons/avator/dh_7.svg'
-import dh8 from '@/assets/icons/avator/dh_8.svg'
 
 type DHSettingParams = {
   digitalHumanId?: string
 }
 
-/** 管理员全页配置：新建 `/management/setting`，编辑 `/management/:id/setting?mode=edit` */
+/** 管理员全页配置：新建 `/studio/digital-human/setting`，编辑 `/studio/digital-human/:id/setting?mode=edit` */
 const DHSetting = () => {
   const params = useParams<DHSettingParams>()
   const [searchParams] = useSearchParams()
@@ -50,17 +43,6 @@ const DHSetting = () => {
   const [publishing, setPublishing] = useState(false)
   const [deleteModalOpen, setDeleteModalOpen] = useState(false)
 
-  const avatarIconMap: Record<string, string> = {
-    dh_1: dh1,
-    dh_2: dh2,
-    dh_3: dh3,
-    dh_4: dh4,
-    dh_5: dh5,
-    dh_6: dh6,
-    dh_7: dh7,
-    dh_8: dh8,
-  }
-
   // 创建模式进入时生成一个随机头像 ID（整个页面生命周期内保持不变）
   const [createAvatarId] = useState<string>(() => `dh_${Math.floor(Math.random() * 8) + 1}`)
 
@@ -71,21 +53,21 @@ const DHSetting = () => {
   useLayoutEffect(() => {
     if (isAdmin) return
     if (!routeId) {
-      navigate(`/digital-human/management`, { replace: true })
+      navigate(`/studio/digital-human`, { replace: true })
       return
     }
-    navigate(`/digital-human/management/${routeId}`, { replace: true })
+    navigate(`/studio/digital-human/${routeId}`, { replace: true })
   }, [isAdmin, routeId, navigate])
 
   const loading = useDigitalHumanPageLoad(routeId, 'setting', modeFromQuery, isAdmin)
 
   const handleBack = () => {
-    navigate('/digital-human/management')
+    navigate('/studio/digital-human')
   }
 
   const handleCancelEdit = () => {
     if (isEditFromUrl) {
-      navigate('/digital-human/management')
+      navigate('/studio/digital-human')
       return
     }
     resetAllToDetail()
@@ -95,12 +77,9 @@ const DHSetting = () => {
   const headerDisplayName =
     uiMode === 'edit' ? (frozenDisplayNameForEdit ?? basic.name).trim() || basic.name : basic.name
 
-  const headerAvatarSrc =
-    uiMode === 'create'
-      ? avatarIconMap[createAvatarId]
-      : detail?.icon_id
-        ? avatarIconMap[detail.icon_id]
-        : undefined
+  const headerAvatarSrc = resolveDigitalHumanIconSrc(
+    uiMode === 'create' ? createAvatarId : detail?.icon_id,
+  )
 
   const handlePublish = async () => {
     const name = basic.name.trim()
@@ -140,7 +119,7 @@ const DHSetting = () => {
       } else {
         await createDigitalHuman(createBody)
         message.success('创建成功')
-        navigate(`/digital-human/management`, { replace: true })
+        navigate(`/studio/digital-human`, { replace: true })
       }
     } catch (err: any) {
       message.error(err?.description || '发布失败')
@@ -165,7 +144,7 @@ const DHSetting = () => {
         onCancel={() => setDeleteModalOpen(false)}
         onOk={() => {
           setDeleteModalOpen(false)
-          navigate('/digital-human/management')
+          navigate('/studio/digital-human')
         }}
       />
       <div className="flex items-center justify-between h-12 pl-3 pr-6 border-b border-[--dip-border-color] bg-white flex-shrink-0">

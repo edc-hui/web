@@ -55,22 +55,22 @@ const Management = () => {
 
   /** 新建数字员工（仅管理员） */
   const handleCreate = () => {
-    navigate(`/digital-human/management/setting`)
+    navigate(`/studio/digital-human/setting`)
   }
 
   const handleCardClick = (digitalHuman: DigitalHuman) => {
     if (isAdmin) {
-      navigate(`/digital-human/management/${digitalHuman.id}/setting`)
+      navigate(`/studio/digital-human/${digitalHuman.id}/setting`)
       return
     }
-    navigate(`/digital-human/management/${digitalHuman.id}`)
+    navigate(`/studio/digital-human/${digitalHuman.id}`)
   }
 
   const handleMenuClick = (key: DigitalHumanManagementActionEnum, digitalHuman: DigitalHuman) => {
     setSelectedItem(digitalHuman)
     switch (key) {
       case DigitalHumanManagementActionEnum.Edit:
-        navigate(`/digital-human/management/${digitalHuman.id}/setting?mode=edit`)
+        navigate(`/studio/digital-human/${digitalHuman.id}/setting?mode=edit`)
         break
       case DigitalHumanManagementActionEnum.Delete:
         setDeleteModalVisible(true)
@@ -143,15 +143,13 @@ const Management = () => {
   }
 
   return (
-    <div className="h-full p-6 pb-0 flex flex-col relative bg-white">
+    <div className="h-full p-6 pb-0 flex flex-col relative bg-[#F8FAFC]">
       {messageContextHolder}
       <div className="flex justify-between items-center mb-4 flex-shrink-0 z-20">
         <span className="font-bold text-lg text-[--dip-text-color]">全部</span>
         {(hasLoadedData || searchValue) && (
           <div className="flex items-center gap-x-3">
             <SearchInput
-              variant="outlined"
-              className="!rounded"
               onSearch={handleSearch}
               placeholder={intl.get('digitalHuman.management.searchPlaceholder')}
             />

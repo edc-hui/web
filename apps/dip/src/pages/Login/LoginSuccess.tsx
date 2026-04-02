@@ -58,18 +58,18 @@ const LoginSuccess = () => {
                   const guideStatus = await getGuideStatus()
                   if (hasNavigatedRef.current) return
                   if (guideStatus.ready) {
-                    navigate('/digital-human/management', { replace: true })
+                    navigate('/studio/digital-human', { replace: true })
                     return
                   }
 
-                  navigate('/initial-configuration', {
+                  navigate('/studio/initial-configuration', {
                     replace: true,
                     state: { guideStatus, breadcrumbMode: 'init-only' },
                   })
                 } catch {
                   // 初始化状态接口失败时，避免阻塞管理员进入系统
                   if (hasNavigatedRef.current) return
-                  navigate('/digital-human/management', { replace: true })
+                  navigate('/studio/digital-human', { replace: true })
                 }
               })()
             } else {

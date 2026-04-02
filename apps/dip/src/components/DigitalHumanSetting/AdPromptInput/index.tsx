@@ -159,7 +159,6 @@ const AdPromptInput = forwardRef<AdPromptInputRef, AdPromptInputProps>((props, r
       const searchStr = cursorBeforeStr.slice(lastCharacterIndex + 1)
       // triggerCharacter之后可以输入空格以终止查询操作
       // if (!isIncludeSpacesOrLineBreak(searchStr)) {
-      // console.log(searchStr, 'searchStr+++++++++');
       // todo 中文输入法存在自动补}的情况，要么补全}的情况下  禁止弹下拉选择框， 要么光标放在}后面弹框
       if (searchStr === '' || searchStr === '}') {
         searchStrRef.current = searchStr

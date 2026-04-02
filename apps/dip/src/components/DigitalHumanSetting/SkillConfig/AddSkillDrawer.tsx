@@ -1,14 +1,20 @@
-import { Drawer } from 'antd'
+import { Drawer, type DrawerProps } from 'antd'
 import DipChatKit from '@/components/DipChatKit'
 import type { AiPromptSubmitPayload } from '@/components/DipChatKit/components/AiPromptInput/types'
 import IconFont from '@/components/IconFont'
+
 export interface AddSkillDrawerProps {
   open: boolean
   onClose: () => void
   payload?: AiPromptSubmitPayload
+  /** 抽屉挂载节点；不传时使用数字员工设置页容器 `#digital-human-setting-container` */
+  getContainer?: DrawerProps['getContainer']
 }
 
-const AddSkillDrawer = ({ open, onClose, payload }: AddSkillDrawerProps) => {
+const defaultGetContainer = () =>
+  document.getElementById('digital-human-setting-container') as HTMLElement
+
+const AddSkillDrawer = ({ open, onClose, payload, getContainer }: AddSkillDrawerProps) => {
   return (
     <Drawer
       title={
@@ -28,14 +34,6 @@ const AddSkillDrawer = ({ open, onClose, payload }: AddSkillDrawerProps) => {
           </span>
         </div>
       }
-      // extra={
-      //   <div className="flex items-center gap-2 ml-2">
-      //     <Button onClick={onClose}>取消</Button>
-      //     <Button type="primary" onClick={handlePublish}>
-      //       发布
-      //     </Button>
-      //   </div>
-      // }
       open={open}
       zIndex={1100}
       onClose={onClose}
@@ -62,7 +60,7 @@ const AddSkillDrawer = ({ open, onClose, payload }: AddSkillDrawerProps) => {
         },
         body: { padding: 0 },
       }}
-      getContainer={() => document.getElementById('digital-human-setting-container') as HTMLElement}
+      getContainer={getContainer ?? defaultGetContainer}
     >
       <div className="flex flex-col h-full min-h-0">
         <div className="flex flex-1 min-h-0">

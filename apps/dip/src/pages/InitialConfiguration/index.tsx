@@ -13,9 +13,10 @@ import { useUserInfoStore } from '@/stores/userInfoStore'
 import CheckEnvironmentStep from './components/CheckEnvironmentStep'
 import ConnectOpenClawStep from './components/ConnectOpenClawStep'
 import InitializeResultStep from './components/InitializeResultStep'
+import SelectPresetDigitalHumanStep from './components/SelectPresetDigitalHumanStep'
 import type { StepKey } from './types'
 
-const stepTitles = ['连接 OpenClaw', '检测环境', '完成初始化']
+const stepTitles = ['连接 OpenClaw', '检测环境', '选择预置数字员工', '完成初始化']
 const MIN_STEP2_STAY_MS = 3000
 
 const InitialConfiguration = () => {
@@ -65,10 +66,10 @@ const InitialConfiguration = () => {
   }, [detectedConfig, form])
 
   useEffect(() => {
-    if (step !== 2 || !initResult) return
+    if (step !== 3 || !initResult) return
 
     const t = window.setTimeout(() => {
-      navigate('/digital-human/management', { replace: true })
+      navigate('/studio/digital-human', { replace: true })
     }, 2000)
 
     return () => window.clearTimeout(t)
@@ -137,6 +138,15 @@ const InitialConfiguration = () => {
 
     if (step === 1) {
       return <CheckEnvironmentStep />
+    }
+
+    if (step === 2) {
+      return (
+        <SelectPresetDigitalHumanStep
+          onSkip={() => setStep(3)}
+          onConfirmSuccess={() => setStep(3)}
+        />
+      )
     }
 
     return <InitializeResultStep initResult={initResult} />

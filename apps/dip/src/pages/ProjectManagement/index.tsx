@@ -154,7 +154,12 @@ const ProjectManagement = () => {
         </div>
         {(hasLoadedData || searchValue) && (
           <div className="flex items-center gap-x-3">
-            <SearchInput onSearch={handleSearch} placeholder="搜索项目" />
+            <SearchInput
+              variant="borderless"
+              className="!rounded-2xl"
+              onSearch={handleSearch}
+              placeholder="搜索项目"
+            />
             <Tooltip title="刷新">
               <Button type="text" icon={<IconFont type="icon-refresh" />} onClick={handleRefresh} />
             </Tooltip>

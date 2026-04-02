@@ -79,7 +79,7 @@ const ChannelConfig = ({ readonly }: ChannelConfigProps) => {
               <Button
                 type="text"
                 onClick={() => deleteChannel()}
-                icon={<IconFont type="icon-trash" />}
+                icon={<IconFont type="icon-remove" />}
               />
             </Tooltip>
           </Flex>

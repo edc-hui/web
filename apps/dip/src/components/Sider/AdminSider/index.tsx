@@ -63,7 +63,7 @@ const AdminSider = ({ collapsed, onCollapse, layout = 'entry' }: AdminSiderProps
               selectedKey={selectedKey}
               roleIds={new Set<string>([])}
               navigate={navigate}
-              allowedKeys={['digital-human-management']}
+              allowedKeys={['digital-human', 'skills']}
             />
           ) : null}
         </div>

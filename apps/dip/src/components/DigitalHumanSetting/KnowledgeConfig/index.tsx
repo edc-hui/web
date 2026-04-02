@@ -73,7 +73,7 @@ const KnowledgeConfig = ({ readonly }: KnowledgeConfigProps) => {
                   e.stopPropagation()
                   deleteBkn(record.url)
                 }}
-                icon={<IconFont type="icon-trash" />}
+                icon={<IconFont type="icon-remove" />}
               />
             </Tooltip>
           </Flex>

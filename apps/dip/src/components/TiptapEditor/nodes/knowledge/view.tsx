@@ -92,7 +92,6 @@ const KnowledgeView: React.FC<NodeViewProps> = (props) => {
       {/* 搜索框 */}
       <div className="px-4">
         <SearchInput
-          variant="outlined"
           className="w-full"
           placeholder={`搜索${extension.options.dictionary.name}`}
           onSearch={(value) => setSearchValue(value)}

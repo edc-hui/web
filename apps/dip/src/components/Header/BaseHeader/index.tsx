@@ -46,7 +46,7 @@ const BaseHeader = ({ headerType }: { headerType: HeaderType }) => {
     //   return '/home'
     // }
     // const path =
-    //   firstRoute?.path ?? (headerType === 'store' ? 'store/my-app' : 'digital-human/management')
+    //   firstRoute?.path ?? (headerType === 'store' ? 'store/my-app' : 'studio/digital-human')
     // return `/${path}`
     return '/'
   }, [headerType, roleIds, isAdmin])

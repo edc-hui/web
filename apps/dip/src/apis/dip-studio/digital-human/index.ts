@@ -1,5 +1,6 @@
 import { del, get, post, put } from '@/utils/http'
 import type {
+  BuiltInDigitalHumanList,
   CreateDigitalHumanRequest,
   CreateDigitalHumanResponse,
   DeleteDigitalHumanDeleteFiles,
@@ -15,6 +16,8 @@ export type {
   BknEntry,
   ChannelConfig,
   ChannelType,
+  BuiltInDigitalHumanList,
+  BuiltInDigitalHuman,
   CreateDigitalHumanRequest,
   CreateDigitalHumanResponse,
   DeleteDigitalHumanDeleteFiles,
@@ -28,6 +31,22 @@ export type {
 } from './index.d'
 
 const BASE = '/api/dip-studio/v1'
+
+/** 获取预置数字员工模板列表（getBuiltInDigitalHumanList） */
+export const getBuiltInDigitalHumanList = (): Promise<BuiltInDigitalHumanList> => {
+  const p1 = get(`${BASE}/digital-human/built-in`)
+  const p2 = p1.then((result: unknown) =>
+    Array.isArray(result) ? (result as BuiltInDigitalHumanList) : [],
+  )
+  p2.abort = p1.abort
+  return p2
+}
+
+/** 根据模板 ID 创建或更新预置数字员工（createBuiltInDigitalHuman） */
+export const createBuiltInDigitalHuman = (
+  ids: string,
+): Promise<CreateDigitalHumanResponse[]> =>
+  put(`${BASE}/digital-human/built-in/${ids}`)
 
 /** 获取数字员工列表（getDigitalHumanList） */
 export const getDigitalHumanList = (): Promise<DigitalHumanList> => {

@@ -45,3 +45,37 @@ export function getHoverColor(hex: string): string {
   const b = Math.min(255, parseInt(result[3], 16) + 30)
   return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`
 }
+
+export const DEFAULT_SKILL_ICON_COLORS = [
+  '#39A835',
+  '#2172C0',
+  '#1D1C52',
+  '#64BEB7',
+  '#6CA016',
+  '#227F96',
+  '#A3E034',
+  '#45C5E4',
+  '#10A5B7',
+  '#1B669C',
+  '#55A54E',
+  '#A46E37',
+]
+
+function hashName(name: string): number {
+  let h = 0
+  for (let i = 0; i < name.length; i += 1) {
+    h = (h << 5) - h + name.charCodeAt(i)
+    h |= 0
+  }
+  return Math.abs(h)
+}
+
+/**
+ * 图标颜色：用固定 hash 算法，根据「名称 + 颜色数组」稳定匹配到数组中的某个颜色。
+ * @param name 技能名称
+ * @param colors 随机颜色数组（由调用方传入）
+ */
+export function getMatchedColorByName(name: string, colors: string[]): string {
+  const palette = Array.isArray(colors) && colors.length ? colors : DEFAULT_SKILL_ICON_COLORS
+  return palette[hashName(name) % palette.length]
+}

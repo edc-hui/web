@@ -8,6 +8,7 @@ import AppList from '@/components/AppList'
 import { ModeEnum } from '@/components/AppList/types'
 import AppUploadModal from '@/components/AppUploadModal'
 import Empty from '@/components/Empty'
+import GradientContainer from '@/components/GradientContainer'
 import IconFont from '@/components/IconFont'
 import SearchInput from '@/components/SearchInput'
 import { useApplicationsService } from '@/hooks/useApplicationsService'
@@ -176,13 +177,13 @@ const AppStore = () => {
       <AppList
         mode={ModeEnum.AppStore}
         apps={apps}
-        menuItems={(app) => getAppStoreMenuItems((key) => handleMenuClick(key, app))}
+        menuItems={(app) => getAppStoreMenuItems(app, (key) => handleMenuClick(key, app))}
       />
     )
   }
 
   return (
-    <div className="h-full p-6 pb-0 flex flex-col relative">
+    <GradientContainer className="h-full p-6 pb-0 flex flex-col relative">
       {contextHolder}
       {messageContextHolder}
       <div className="flex justify-between mb-6 flex-shrink-0 z-20">
@@ -194,7 +195,12 @@ const AppStore = () => {
         </div>
         {(hasLoadedData || searchValue) && (
           <div className="flex items-center gap-x-2">
-            <SearchInput onSearch={handleSearch} placeholder="搜索应用" />
+            <SearchInput
+              variant="borderless"
+              className="!rounded-2xl"
+              onSearch={handleSearch}
+              placeholder="搜索应用"
+            />
             <Tooltip title="刷新">
               <Button type="text" icon={<IconFont type="icon-refresh" />} onClick={handleRefresh} />
             </Tooltip>
@@ -251,7 +257,7 @@ const AppStore = () => {
           })
         }}
       />
-    </div>
+    </GradientContainer>
   )
 }
 

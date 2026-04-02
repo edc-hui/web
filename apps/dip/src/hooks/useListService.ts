@@ -7,6 +7,18 @@ interface UseListServiceOptions<T, P extends any[] = []> {
   autoLoad?: boolean
   /** 自定义过滤函数，默认使用 name 字段进行模糊匹配 */
   filterFn?: (item: T, keyword: string) => boolean
+  /**
+   * 当 `autoLoad === true` 且 `searchValue` 变化时，用于生成传给 `fetchFn` 的参数。
+   * 常用于让搜索走接口过滤，而不是仅做本地过滤。
+   */
+  getFetchArgs?: (searchValue: string) => P
+  /**
+   * 是否禁用本地过滤。
+   * 为 `true` 时，列表将直接展示接口返回结果（即使 `searchValue` 非空）。
+   * 默认行为：当你提供了 `getFetchArgs`（即搜索走接口过滤）时，会自动视为 `disableLocalFilter: true`，
+   * 以避免接口过滤后再做二次本地过滤；如需保留本地过滤，可显式设置 `disableLocalFilter: false`。
+   */
+  disableLocalFilter?: boolean
 }
 
 /**
@@ -24,7 +36,7 @@ interface UseListServiceOptions<T, P extends any[] = []> {
 export const useListService = <T extends { name?: string }, P extends any[] = []>(
   options: UseListServiceOptions<T, P>,
 ) => {
-  const { fetchFn, autoLoad = true, filterFn } = options
+  const { fetchFn, autoLoad = true, filterFn, getFetchArgs, disableLocalFilter } = options
   const [items, setItems] = useState<T[]>([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -38,6 +50,10 @@ export const useListService = <T extends { name?: string }, P extends any[] = []
   }, [])
 
   const finalFilterFn = filterFn || defaultFilterFn
+
+  // 你提供了 getFetchArgs 时，通常意味着接口已经完成过滤，此时不应该再做二次本地过滤。
+  // 允许通过显式设置 disableLocalFilter: false 来覆盖默认行为。
+  const disableLocalFilterEffective = disableLocalFilter ?? Boolean(getFetchArgs)
 
   /** 获取列表数据（参数完全透传给外部 fetchFn） */
   const fetchList = useCallback(
@@ -66,9 +82,8 @@ export const useListService = <T extends { name?: string }, P extends any[] = []
         currentRequestRef.current = null
 
         // 使用当前搜索词进行本地过滤（不影响外部 API 的参数）
-        const filtered = searchValue
-          ? data.filter((item) => finalFilterFn(item, searchValue))
-          : data
+        const shouldLocalFilter = !!searchValue && !disableLocalFilterEffective
+        const filtered = shouldLocalFilter ? data.filter((item) => finalFilterFn(item, searchValue)) : data
         setItems(filtered)
       } catch (err: any) {
         // 请求被取消时，清除引用但不更新状态
@@ -90,7 +105,7 @@ export const useListService = <T extends { name?: string }, P extends any[] = []
         }
       }
     },
-    [fetchFn, finalFilterFn, searchValue],
+    [fetchFn, finalFilterFn, searchValue, disableLocalFilterEffective],
   )
 
   /** 刷新数据 */
@@ -110,9 +125,13 @@ export const useListService = <T extends { name?: string }, P extends any[] = []
   // 自动加载模式：初始化和搜索时加载数据
   useEffect(() => {
     if (autoLoad) {
-      fetchList(...([] as unknown as P))
+      if (getFetchArgs) {
+        fetchList(...getFetchArgs(searchValue))
+      } else {
+        fetchList(...([] as unknown as P))
+      }
     }
-  }, [autoLoad, fetchList, searchValue])
+  }, [autoLoad, fetchList, searchValue, getFetchArgs])
 
   // 组件卸载时取消正在进行的请求
   useEffect(() => {

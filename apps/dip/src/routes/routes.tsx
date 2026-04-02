@@ -4,6 +4,7 @@ import appStoreUrl from '@/assets/images/sider/appStore.svg'
 import chatUrl from '@/assets/images/sider/chat.svg'
 import digitalHumanUrl from '@/assets/images/sider/digitalHuman.svg'
 import dipStudioUrl from '@/assets/images/sider/dipStudio.svg'
+import skillUrl from '@/assets/images/sider/skill.svg'
 import type { RouteConfig } from './types'
 
 const MyApp = lazy(() => import('../pages/MyApp'))
@@ -14,6 +15,8 @@ const WorkPlanDetail = lazy(() => import('../pages/WorkPlan/Details'))
 const History = lazy(() => import('../pages/History'))
 const HistoryConversation = lazy(() => import('../pages/History/HistoryConversation'))
 const DigitalHumanManagement = lazy(() => import('../pages/DigitalHuman/Management'))
+const SkillsManagement = lazy(() => import('../pages/Skills'))
+const SkillsDetailPage = lazy(() => import('../pages/Skills/Details'))
 const DigitalHumanDetail = lazy(() => import('../pages/DigitalHuman/Details'))
 const DHSetting = lazy(() => import('../pages/DigitalHuman/DHSetting'))
 const Conversation = lazy(() => import('../pages/Conversation'))
@@ -81,12 +84,43 @@ export const routeConfigs: RouteConfig[] = [
 
   // --- DIP Studio Section ---
   {
-    path: 'digital-human/management',
-    key: 'digital-human-management',
+    path: 'studio/digital-human',
+    key: 'digital-human',
     label: '我的数字员工',
     iconUrl: digitalHumanUrl,
     element: <DigitalHumanManagement />,
     sidebarMode: 'menu',
+    handle: {
+      layout: {
+        hasHeader: true,
+        siderMode: 'app',
+        module: 'studio',
+        headerType: 'studio',
+      },
+    },
+  },
+  {
+    path: 'studio/skills',
+    key: 'skills',
+    label: '技能管理',
+    iconUrl: skillUrl,
+    element: <SkillsManagement />,
+    sidebarMode: 'menu',
+    handle: {
+      layout: {
+        hasHeader: true,
+        siderMode: 'app',
+        module: 'studio',
+        headerType: 'studio',
+      },
+    },
+  },
+  {
+    path: 'studio/skills/:skillName',
+    key: 'skill-item',
+    label: '技能详情',
+    element: <SkillsDetailPage />,
+    sidebarMode: 'hidden',
     handle: {
       layout: {
         hasHeader: true,
@@ -114,7 +148,7 @@ export const routeConfigs: RouteConfig[] = [
     },
   },
   {
-    path: 'work-plan',
+    path: 'studio/work-plan',
     key: 'work-plan',
     label: '工作计划',
     iconUrl: dipStudioUrl,
@@ -130,7 +164,7 @@ export const routeConfigs: RouteConfig[] = [
     },
   },
   {
-    path: 'work-plan/:workPlanId',
+    path: 'studio/work-plan/:workPlanId',
     key: 'work-plan-item',
     label: '工作计划详情',
     element: <WorkPlanDetail />,
@@ -145,7 +179,7 @@ export const routeConfigs: RouteConfig[] = [
     },
   },
   {
-    path: 'history',
+    path: 'studio/history',
     key: 'history',
     label: '历史记录',
     iconUrl: dipStudioUrl,
@@ -161,7 +195,7 @@ export const routeConfigs: RouteConfig[] = [
     },
   },
   {
-    path: 'history/:sessionKey',
+    path: 'studio/history/:sessionKey',
     key: 'history-item',
     label: '历史记录',
     element: <HistoryConversation />,
@@ -176,7 +210,7 @@ export const routeConfigs: RouteConfig[] = [
     },
   },
   {
-    path: 'digital-human/management/setting',
+    path: 'studio/digital-human/setting',
     key: 'digital-human-setting-new',
     label: '新建数字员工',
     element: <DHSetting />,
@@ -190,54 +224,8 @@ export const routeConfigs: RouteConfig[] = [
       },
     },
   },
-  // 详情 Tab 暂用页面 state，子路径路由先关闭
-  // {
-  //   path: 'digital-human/management/:digitalHumanId/plan',
-  //   key: 'digital-human-detail-plan',
-  //   label: '数字员工详情',
-  //   element: <DigitalHumanDetail />,
-  //   sidebarMode: 'hidden',
-  //   handle: {
-  //     layout: {
-  //       hasSider: true,
-  //       hasHeader: false,
-  //       siderType: 'studio',
-  //       headerType: 'home',
-  //     },
-  //   },
-  // },
-  // {
-  //   path: 'digital-human/management/:digitalHumanId/session',
-  //   key: 'digital-human-detail-session',
-  //   label: '数字员工详情',
-  //   element: <DigitalHumanDetail />,
-  //   sidebarMode: 'hidden',
-  //   handle: {
-  //     layout: {
-  //       hasSider: true,
-  //       hasHeader: false,
-  //       siderType: 'studio',
-  //       headerType: 'home',
-  //     },
-  //   },
-  // },
-  // {
-  //   path: 'digital-human/management/:digitalHumanId/config',
-  //   key: 'digital-human-detail-config',
-  //   label: '数字员工详情',
-  //   element: <DigitalHumanDetail />,
-  //   sidebarMode: 'hidden',
-  //   handle: {
-  //     layout: {
-  //       hasSider: true,
-  //       hasHeader: false,
-  //       siderType: 'studio',
-  //       headerType: 'home',
-  //     },
-  //   },
-  // },
   {
-    path: 'digital-human/management/:digitalHumanId/setting',
+    path: 'studio/digital-human/:digitalHumanId/setting',
     key: 'digital-human-setting-item',
     label: '数字员工配置',
     element: <DHSetting />,
@@ -252,7 +240,7 @@ export const routeConfigs: RouteConfig[] = [
     },
   },
   {
-    path: 'digital-human/management/:digitalHumanId',
+    path: 'studio/digital-human/:digitalHumanId',
     key: 'digital-human-detail',
     label: '数字员工详情',
     element: <DigitalHumanDetail />,
@@ -267,7 +255,7 @@ export const routeConfigs: RouteConfig[] = [
     },
   },
   {
-    path: 'initial-configuration',
+    path: 'studio/initial-configuration',
     key: 'initial-configuration',
     label: '系统初始化配置',
     element: <InitialConfiguration />,

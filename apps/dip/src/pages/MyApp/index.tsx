@@ -5,9 +5,11 @@ import type { ApplicationInfo } from '@/apis'
 import AppList from '@/components/AppList'
 import { ModeEnum } from '@/components/AppList/types'
 import Empty from '@/components/Empty'
+import GradientContainer from '@/components/GradientContainer'
 import IconFont from '@/components/IconFont'
 import SearchInput from '@/components/SearchInput'
 import { useApplicationsService } from '@/hooks/useApplicationsService'
+import { WENSHU_APP_KEY } from '@/routes/types'
 import { usePreferenceStore } from '@/stores'
 import { MyAppActionEnum } from './types'
 import { getMyAppMoreBtn } from './utils'
@@ -122,10 +124,9 @@ const MyApp = () => {
         mode={ModeEnum.MyApp}
         apps={apps}
         moreBtn={(app) =>
-          // app.key === WENSHU_APP_KEY
-          //   ? undefined
-          //   :
-          getMyAppMoreBtn(app, (key) => handleMenuClick(key, app))
+          app.key === WENSHU_APP_KEY
+            ? undefined
+            : getMyAppMoreBtn(app, (key) => handleMenuClick(key, app))
         }
         onMenuButtonClick={(app) => handleMenuClick(MyAppActionEnum.Use, app)}
       />
@@ -133,7 +134,7 @@ const MyApp = () => {
   }
 
   return (
-    <div className="h-full p-6 pb-0 flex flex-col relative overflow-auto">
+    <GradientContainer className="h-full p-6 pb-0 flex flex-col relative overflow-auto">
       {messageContextHolder}
       <div className="flex justify-between mb-4 flex-shrink-0 z-20">
         <div className="flex flex-col gap-y-3">
@@ -144,7 +145,12 @@ const MyApp = () => {
         </div>
         {(hasLoadedData || searchValue) && (
           <div className="flex items-center gap-x-2">
-            <SearchInput onSearch={handleSearch} placeholder="搜索应用" />
+            <SearchInput
+              variant="borderless"
+              className="!rounded-2xl"
+              onSearch={handleSearch}
+              placeholder="搜索应用"
+            />
             <Tooltip title="刷新">
               <Button type="text" icon={<IconFont type="icon-refresh" />} onClick={handleRefresh} />
             </Tooltip>
@@ -153,7 +159,7 @@ const MyApp = () => {
       </div>
       {/* 预留占位，避免 loading→列表 切换时产生 CLS */}
       <div className="flex-1 min-h-0 relative flex flex-col">{renderContent()}</div>
-    </div>
+    </GradientContainer>
   )
 }
 

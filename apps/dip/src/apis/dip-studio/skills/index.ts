@@ -1,10 +1,19 @@
 import { del, get, post } from '@/utils/http'
-import type { DigitalHumanSkillList, InstallSkillResult, UninstallSkillResult } from './index.d'
+import type {
+  DigitalHumanSkillList,
+  InstallSkillResult,
+  SkillFileContentResponse,
+  SkillTreeResponse,
+  UninstallSkillResult,
+} from './index.d'
 
 export type {
   DigitalHumanSkill,
   DigitalHumanSkillList,
   InstallSkillResult,
+  SkillFileContentResponse,
+  SkillTreeEntry,
+  SkillTreeResponse,
   UninstallSkillResult,
 } from './index.d'
 
@@ -16,7 +25,9 @@ export interface GetEnabledSkillsParams {
 }
 
 /** 获取全局启用技能列表（getEnabledSkills，`GET /skills`） */
-export const getEnabledSkills = (params?: GetEnabledSkillsParams): Promise<DigitalHumanSkillList> => {
+export const getEnabledSkills = (
+  params?: GetEnabledSkillsParams,
+): Promise<DigitalHumanSkillList> => {
   const p1 = get(`${BASE}/skills`, { params })
   const p2 = p1.then((result: unknown) =>
     Array.isArray(result) ? (result as DigitalHumanSkillList) : [],
@@ -70,6 +81,44 @@ export const installSkill = (payload: InstallSkillPayload): Promise<InstallSkill
 export const uninstallSkill = (name: string): Promise<UninstallSkillResult> => {
   const p1 = del(`${BASE}/skills/${encodeURIComponent(name)}`)
   const p2 = p1.then((result: unknown) => result as UninstallSkillResult)
+  p2.abort = p1.abort
+  return p2
+}
+
+/** 获取技能目录树（getSkillTree，`GET /skills/{name}/tree`） */
+export const getSkillTree = (name: string): Promise<SkillTreeResponse> => {
+  const p1 = get(`${BASE}/skills/${encodeURIComponent(name)}/tree`)
+  const p2 = p1.then((result: unknown) => result as SkillTreeResponse)
+  p2.abort = p1.abort
+  return p2
+}
+
+export interface GetSkillFileContentParams {
+  /** 技能根目录下的相对路径，如 `SKILL.md`、`docs/guide.md` */
+  path: string
+}
+
+/** 预览技能文件内容（getSkillFileContent，`GET /skills/{name}/content`） */
+export const getSkillFileContent = (
+  name: string,
+  params?: GetSkillFileContentParams,
+): Promise<SkillFileContentResponse> => {
+  const p1 = get(`${BASE}/skills/${encodeURIComponent(name)}/content`, { params })
+  const p2 = p1.then((result: unknown) => result as SkillFileContentResponse)
+  p2.abort = p1.abort
+  return p2
+}
+
+/** 下载技能文件（downloadSkillFile，`GET /skills/{name}/download`） */
+export const downloadSkillFile = (
+  name: string,
+  params: GetSkillFileContentParams,
+): Promise<ArrayBuffer> => {
+  const p1 = get(`${BASE}/skills/${encodeURIComponent(name)}/download`, {
+    params,
+    responseType: 'arraybuffer',
+  })
+  const p2 = p1.then((result: unknown) => result as ArrayBuffer)
   p2.abort = p1.abort
   return p2
 }

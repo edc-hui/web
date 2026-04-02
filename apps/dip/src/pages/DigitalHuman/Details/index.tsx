@@ -7,6 +7,7 @@ import { useDigitalHumanStore } from '@/components/DigitalHumanSetting/digitalHu
 import IconFont from '@/components/IconFont'
 import WorkPlanList from '@/components/WorkPlanList'
 import { useUserInfoStore } from '@/stores/userInfoStore'
+import { resolveDigitalHumanIconSrc } from '@/utils/digital-human/resolveDigitalHumanIcon'
 import { formatTimeSlash } from '@/utils/handle-function/FormatTime'
 import { useDigitalHumanPageLoad } from '../useDigitalHumanPageLoad'
 import Conversation from './Conversation'
@@ -42,10 +43,10 @@ const Details = () => {
   useLayoutEffect(() => {
     if (!isAdmin) return
     if (!digitalHumanId) {
-      navigate('/digital-human/management/setting', { replace: true })
+      navigate('/studio/digital-human/setting', { replace: true })
       return
     }
-    navigate(`/digital-human/management/${digitalHumanId}/setting${location.search}`, {
+    navigate(`/studio/digital-human/${digitalHumanId}/setting${location.search}`, {
       replace: true,
     })
   }, [isAdmin, digitalHumanId, navigate, location.search])
@@ -54,24 +55,29 @@ const Details = () => {
   // useEffect(() => {
   //   if (!digitalHumanId || isAdmin) return
   //   if (!activeTab) {
-  //     navigate(`/digital-human/management/${digitalHumanId}/plan`, { replace: true })
+  //     navigate(`/studio/digital-human/${digitalHumanId}/plan`, { replace: true })
   //   }
   // }, [digitalHumanId, activeTab, isAdmin, navigate])
 
   /** 非法 id */
   useEffect(() => {
     if (!digitalHumanId) {
-      navigate('/digital-human/management', { replace: true })
+      navigate('/studio/digital-human', { replace: true })
     }
   }, [digitalHumanId, navigate])
 
   const loading = useDigitalHumanPageLoad(digitalHumanId, 'detail', null, !isAdmin)
 
+  const headerAvatarSrc = useMemo(
+    () => resolveDigitalHumanIconSrc(detail?.icon_id),
+    [detail?.icon_id],
+  )
+
   const onTabChange = useCallback((key: string) => {
     setActiveTab(key as DigitalHumanDetailTab)
     // if (!digitalHumanId) return
     // const k = key as DigitalHumanDetailTab
-    // navigate(`/digital-human/management/${digitalHumanId}/${k}`, { replace: true })
+    // navigate(`/studio/digital-human/${digitalHumanId}/${k}`, { replace: true })
   }, [])
 
   const tabItems = useMemo(() => {
@@ -117,18 +123,26 @@ const Details = () => {
         <div className="flex items-center gap-2 min-w-0">
           <button
             type="button"
-            onClick={() => navigate('/digital-human/management')}
+            onClick={() => navigate('/studio/digital-human')}
             className="flex items-center justify-center w-8 h-8 rounded-md text-[--dip-text-color] shrink-0"
           >
             <IconFont type="icon-left" />
           </button>
           <div className="flex items-center gap-3 min-w-0">
-            <AppIcon
-              name={basic.name}
-              size={32}
-              className="w-8 h-8 rounded-md overflow-hidden"
-              shape="square"
-            />
+            {headerAvatarSrc ? (
+              <img
+                src={headerAvatarSrc}
+                alt={basic.name}
+                className="w-8 h-8 rounded-md overflow-hidden object-cover shrink-0"
+              />
+            ) : (
+              <AppIcon
+                name={basic.name}
+                size={32}
+                className="w-8 h-8 rounded-md overflow-hidden"
+                shape="square"
+              />
+            )}
             <div className="flex flex-col gap-0.5">
               <span className="font-medium text-[--dip-text-color]">{basic.name}</span>
               {detail?.updated_at && (
@@ -164,7 +178,7 @@ const Details = () => {
               const from = `${location.pathname}${location.search}`
               navigate(
                 {
-                  pathname: `/work-plan/${job.id}`,
+                  pathname: `/studio/work-plan/${job.id}`,
                   search: `?${createSearchParams({
                     sessionKey: job.sessionKey,
                   })}`,

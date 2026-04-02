@@ -3,6 +3,11 @@ import type { BknEntry, ChannelConfig, DigitalHumanDetail, DigitalHumanSkill } f
 
 export type DigitalHumanUiMode = 'create' | 'edit' | 'view'
 
+type DigitalHumanDetailForUI = Omit<DigitalHumanDetail, 'skills'> & {
+  /** UI 使用技能对象列表（由 `getDigitalHumanSkills` 加载并渲染） */
+  skills?: DigitalHumanSkill[]
+}
+
 /** 编辑态基础信息（对齐 DigitalHumanDetail 中的 name / description / creature / soul） */
 export type DigitalHumanBasic = Pick<DigitalHumanDetail, 'name' | 'creature' | 'soul'>
 
@@ -15,8 +20,8 @@ export interface DigitalHumanState {
   /** 当前正在配置的数字员工 ID（与 API 一致为 string） */
   digitalHumanId?: string
 
-  /** 原始详情，不做任何修改（与 API 一致为 DigitalHumanDetail） */
-  detail: DigitalHumanDetail | null
+  /** 原始详情快照（UI 侧补齐 `skills` 为对象列表） */
+  detail: DigitalHumanDetailForUI | null
 
   /** 基本信息 */
   basic: DigitalHumanBasic
@@ -24,7 +29,7 @@ export interface DigitalHumanState {
   /** 知识源列表（对齐 DigitalHumanExtension.bkn） */
   bkn: BknEntry[]
 
-  /** 技能列表（与详情 `DigitalHumanDetail.skills` 一致，为 DigitalHumanSkill[]） */
+  /** 技能列表（用于渲染与编辑） */
   skills: DigitalHumanSkill[]
 
   /** 已绑定的渠道凭证（对齐 DigitalHumanExtension.channel，单通道） */
@@ -39,7 +44,7 @@ export interface DigitalHumanState {
   frozenDisplayNameForEdit: string | null
 
   /** 绑定当前数字员工，并根据详情初始化数据 */
-  bindDigitalHuman: (digitalHuman: DigitalHumanDetail | null) => void
+  bindDigitalHuman: (digitalHuman: DigitalHumanDetail | null, agentSkills?: DigitalHumanSkill[]) => void
 
   /** 重置 dirty 状态（不改变数据内容） */
   resetDirtyState: () => void
@@ -98,7 +103,7 @@ export const useDigitalHumanStore = create<DigitalHumanState>()((set) => ({
       return { uiMode: mode, frozenDisplayNameForEdit: null }
     }),
 
-  bindDigitalHuman: (digitalHuman) => {
+  bindDigitalHuman: (digitalHuman, agentSkills) => {
     if (!digitalHuman) {
       set({
         digitalHumanId: undefined,
@@ -115,6 +120,7 @@ export const useDigitalHumanStore = create<DigitalHumanState>()((set) => ({
 
     set((state) => {
       const name = digitalHuman.name?.trim() ?? ''
+      const nextSkills = agentSkills ?? defaultSkills
       const next = {
         digitalHumanId: digitalHuman.id,
         basic: {
@@ -123,9 +129,13 @@ export const useDigitalHumanStore = create<DigitalHumanState>()((set) => ({
           soul: digitalHuman.soul ?? '',
         },
         bkn: digitalHuman.bkn ?? defaultBkn,
-        skills: digitalHuman.skills ?? defaultSkills,
+        skills: nextSkills,
         channel: digitalHuman.channel,
-        detail: digitalHuman,
+        // detail 快照用于 resetAllToDetail：skills 则应始终是 UI 可用的对象列表
+        detail: {
+          ...digitalHuman,
+          skills: nextSkills,
+        } as DigitalHumanDetailForUI,
         dirty: false,
       }
       if (state.uiMode === 'edit' && state.frozenDisplayNameForEdit === null && name) {
