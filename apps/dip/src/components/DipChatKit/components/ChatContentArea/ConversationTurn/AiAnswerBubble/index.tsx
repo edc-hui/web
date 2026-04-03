@@ -2,7 +2,6 @@ import {
   CheckOutlined,
   CopyOutlined,
   DownOutlined,
-  RedoOutlined,
   UpOutlined,
 } from '@ant-design/icons'
 import { Bubble, CodeHighlighter, Mermaid, Think, ThoughtChain } from '@ant-design/x'
@@ -24,7 +23,6 @@ import type { AiAnswerBubbleProps, DipChatKitToolCardItem } from './types'
 import {
   buildArchiveGridPreviewPayload,
   buildCardPreviewPayload,
-  buildCodePreviewPayload,
   buildMarkdownFilePreviewPayload,
   buildToolCardItems,
   extractThinkingContent,
@@ -318,9 +316,9 @@ const isToolCardStateEqual = (
 
 const AiAnswerBubble: React.FC<AiAnswerBubbleProps> = ({
   turn,
-  isLatestAnswerTurn,
+  isLatestAnswerTurn: _isLatestAnswerTurn,
   onCopy,
-  onRegenerate,
+  onRegenerate: _onRegenerate,
   onOpenPreview,
 }) => {
   const allToolCards = useMemo(() => {
@@ -440,13 +438,7 @@ const AiAnswerBubble: React.FC<AiAnswerBubbleProps> = ({
 
       if (isMermaidLanguage(language)) {
         return (
-          <div
-            className={styles.blockCodeWrap}
-            onClick={() => {
-              onOpenPreview(buildCodePreviewPayload(language, codeText))
-            }}
-            role="presentation"
-          >
+          <div className={styles.blockCodeWrap}>
             <Mermaid>{codeText}</Mermaid>
           </div>
         )
@@ -468,13 +460,7 @@ const AiAnswerBubble: React.FC<AiAnswerBubbleProps> = ({
       }
 
       return (
-        <div
-          className={styles.blockCodeWrap}
-          onClick={() => {
-            onOpenPreview(buildCodePreviewPayload(language, codeText))
-          }}
-          role="presentation"
-        >
+        <div className={styles.blockCodeWrap}>
           <CodeHighlighter lang={language || 'text'}>{codeText}</CodeHighlighter>
         </div>
       )
@@ -609,24 +595,12 @@ const AiAnswerBubble: React.FC<AiAnswerBubbleProps> = ({
       })
     }
 
-    if (isLatestAnswerTurn && turn.question.trim()) {
-      actions.push({
-        key: 'regenerate-answer',
-        title: intl.get('dipChatKit.regenerateAnswer').d('Regenerate') as string,
-        icon: <RedoOutlined />,
-        onClick: onRegenerate,
-      })
-    }
-
     return actions
   }, [
-    isLatestAnswerTurn,
     onCopy,
-    onRegenerate,
     turn.answerLoading,
     turn.answerMarkdown,
     turn.answerStreaming,
-    turn.question,
   ])
 
   const resolveToolIconType = (toolName: string): string => {

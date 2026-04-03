@@ -1,7 +1,6 @@
 import { VerticalAlignBottomOutlined } from '@ant-design/icons'
-import { Button, message, Skeleton, Tooltip } from 'antd'
+import { Button, message, Tooltip } from 'antd'
 import clsx from 'clsx'
-import isEmpty from 'lodash/isEmpty'
 import isString from 'lodash/isString'
 import type React from 'react'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
@@ -18,9 +17,8 @@ import type { DipChatKitAnswerEvent, DipChatKitPreviewPayload } from '../../type
 import { isAsyncIterable, normalizeStreamChunk } from '../../utils'
 import AiPromptInput from '../AiPromptInput'
 import type { AiPromptSubmitPayload } from '../AiPromptInput/types'
-import ScrollContainer from '../ScrollContainer'
-import type { ScrollContainerRef } from '../ScrollContainer/types'
-import ConversationTurn from './ConversationTurn'
+import VirtualConversationList from './VirtualConversationList'
+import type { VirtualConversationListRef } from './VirtualConversationList/types'
 import styles from './index.module.less'
 import type { ChatContentAreaProps } from './types'
 import { buildRegeneratePayload, mapSessionMessagesToTurns } from './utils'
@@ -66,8 +64,7 @@ const ChatContentArea: React.FC<ChatContentAreaProps> = ({
 }) => {
   const [inputValue, setInputValue] = useState('')
   const [sessionMessagesLoading, setSessionMessagesLoading] = useState(false)
-  const scrollRef = useRef<ScrollContainerRef | null>(null)
-  const messageListContentRef = useRef<HTMLDivElement | null>(null)
+  const scrollRef = useRef<VirtualConversationListRef | null>(null)
   const sessionKeyMapRef = useRef<Record<string, string>>({})
   const autoSentTurnIdsRef = useRef<Set<string>>(new Set())
   const abortControllerMapRef = useRef<Record<string, AbortController>>({})
@@ -396,21 +393,6 @@ const ChatContentArea: React.FC<ChatContentAreaProps> = ({
   }, [streamFingerprint, scroll.autoScrollEnabled])
 
   useEffect(() => {
-    const target = messageListContentRef.current
-    if (!target) return
-
-    const observer = new window.ResizeObserver(() => {
-      if (!scroll.autoScrollEnabled) return
-      scrollRef.current?.scrollToBottom('auto')
-    })
-
-    observer.observe(target)
-    return () => {
-      observer.disconnect()
-    }
-  }, [scroll.autoScrollEnabled])
-
-  useEffect(() => {
     return () => {
       clearScheduledScroll()
     }
@@ -590,56 +572,21 @@ const ChatContentArea: React.FC<ChatContentAreaProps> = ({
 
   return (
     <div className={clsx('ChatContentArea', styles.root)}>
-      <ScrollContainer
+      <VirtualConversationList
         ref={scrollRef}
         className={styles.scrollArea}
+        messageTurns={messageTurns}
+        loading={sessionMessagesLoading}
+        emptyStateText={intl.get('dipChatKit.emptyState').d('请输入问题开始对话。') as string}
+        autoScrollEnabled={scroll.autoScrollEnabled}
         onUserScrollUp={handleUserScrollUp}
         onReachBottomChange={handleReachBottomChange}
-      >
-        <div className={styles.messageList}>
-          <div ref={messageListContentRef} className={styles.messageListContent}>
-            {sessionMessagesLoading && (
-              <div className={styles.sessionLoadingSkeleton}>
-                <Skeleton
-                  active
-                  title={false}
-                  paragraph={{ rows: 4, width: ['46%', '92%', '82%', '70%'] }}
-                />
-                <Skeleton
-                  active
-                  title={false}
-                  paragraph={{ rows: 5, width: ['38%', '88%', '83%', '72%', '48%'] }}
-                />
-                <Skeleton
-                  active
-                  title={false}
-                  paragraph={{ rows: 3, width: ['42%', '96%', '66%'] }}
-                />
-              </div>
-            )}
-            {isEmpty(messageTurns) && !sessionMessagesLoading && (
-              <div className={styles.emptyState}>
-                {intl.get('dipChatKit.emptyState').d('请输入问题开始对话。')}
-              </div>
-            )}
-            {messageTurns.map((turn, index) => {
-              const isLatestAnswerTurn = index === messageTurns.length - 1
-              return (
-                <ConversationTurn
-                  key={turn.id}
-                  turn={turn}
-                  isLatestAnswerTurn={isLatestAnswerTurn}
-                  onEditQuestion={handleEditQuestion}
-                  onCopyQuestion={handleCopyQuestion}
-                  onCopyAnswer={handleCopyAnswer}
-                  onRegenerateAnswer={handleRegenerateAnswer}
-                  onOpenPreview={handleOpenPreview}
-                />
-              )
-            })}
-          </div>
-        </div>
-      </ScrollContainer>
+        onEditQuestion={handleEditQuestion}
+        onCopyQuestion={handleCopyQuestion}
+        onCopyAnswer={handleCopyAnswer}
+        onRegenerateAnswer={handleRegenerateAnswer}
+        onOpenPreview={handleOpenPreview}
+      />
 
       <div className={styles.inputArea}>
         {scroll.showBackToBottom && (

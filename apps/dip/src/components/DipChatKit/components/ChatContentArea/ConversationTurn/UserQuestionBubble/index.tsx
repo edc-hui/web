@@ -1,4 +1,4 @@
-﻿import { CopyOutlined, EditOutlined } from '@ant-design/icons'
+﻿import { CopyOutlined } from '@ant-design/icons'
 import { Bubble, FileCard } from '@ant-design/x'
 import { Col, Row, Tooltip } from 'antd'
 import clsx from 'clsx'
@@ -90,14 +90,6 @@ const UserQuestionBubble: React.FC<UserQuestionBubbleProps> = ({
           <div className={styles.actionsWrap}>
             <MessageActions
               actions={[
-                {
-                  key: 'edit-question',
-                  title: intl.get('dipChatKit.editQuestion').d('编辑问题') as string,
-                  icon: <EditOutlined />,
-                  onClick: () => {
-                    setEditing(true)
-                  },
-                },
                 {
                   key: 'copy-question',
                   title: intl.get('dipChatKit.copyQuestion').d('复制问题') as string,

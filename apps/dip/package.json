@@ -96,6 +96,7 @@
     "react-intl-universal": "^2.13.4",
     "react-router-dom": "^7.9.6",
     "react-virtualized-auto-sizer": "^1.0.26",
+    "react-virtuoso": "^4.18.4",
     "react-window": "^2.2.6",
     "remark-breaks": "^4.0.0",
     "remark-directive": "^4.0.0",
